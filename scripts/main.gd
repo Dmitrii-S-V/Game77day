@@ -121,7 +121,7 @@ func _ready() -> void:
 		print("World: ", world.info)
 		print("World generated in %.1f s" % ((Time.get_ticks_msec() - _boot_ms) / 1000.0))
 
-	$UI/Minimap.setup(world)
+	(get_tree().get_first_node_in_group("minimap") as Minimap).setup(world)   # карта сама переезжает в свой слой выше HUD
 
 	_setup_environment()
 	terrain = Terrain.new()
@@ -835,7 +835,7 @@ func _process_shot(delta: float) -> void:
 				# большая карта (для сравнения с видом сверху): --alt=<метров на экране>
 				var pp := Vector2(player.global_position.x, player.global_position.z)
 				Minimap.marks = [{"pos": pp + Vector2(60, -40), "color": Color(1.0, 0.25, 0.2), "n": 1}]
-				$UI/Minimap.debug_open(Vector2.ZERO, _alt_arg if _alt_arg > 0.0 else 700.0)
+				(get_tree().get_first_node_in_group("minimap") as Minimap).debug_open(Vector2.ZERO, _alt_arg if _alt_arg > 0.0 else 700.0)
 				_shot_wait = 2.0
 			"street", "lake", "burn", "hogweed":
 				if _alt_arg > 0.0:

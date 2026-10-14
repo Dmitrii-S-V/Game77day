@@ -637,7 +637,8 @@ func _trace_river(rng: RandomNumberGenerator) -> void:
 
 # --- предпросмотр -----------------------------------------------------------------
 
-func render_preview(px: int, tree: SceneTree = null) -> Image:
+## overlays=false — без рек, дорог, городов и меток (миникарта рисует их сама векторно, чёткими при любом масштабе).
+func render_preview(px: int, tree: SceneTree = null, overlays := true) -> Image:
 	_pv_size = px
 	_pv_rows.resize(px * px * 3)
 	await _wait(WorkerThreadPool.add_group_task(_pv_row, px), tree)
@@ -655,6 +656,8 @@ func render_preview(px: int, tree: SceneTree = null) -> Image:
 				var dz := iy / sc - c.y
 				if sqrt(dx * dx + dz * dz) < hydro.lake_radius(lk["R"], lk["ph1"], lk["ph2"], atan2(dz, dx)):
 					img.set_pixel(ix, iy, Color(0.18, 0.42, 0.72))
+	if not overlays:
+		return img
 	# реки
 	for rv: Dictionary in hydro.rivers:
 		var pts: PackedVector2Array = rv["pts"]

@@ -5,7 +5,8 @@ class_name Minimap
 ## Del — убрать все метки, M — закрыть. Метки видны на обеих картах; вне экрана — стрелка по краю с расстоянием.
 
 @export var map_size := Vector2(220, 220)
-@export var preview_px := 1024
+@export var preview_px := 1024        # быстрое превью (строится при старте)
+@export var hi_preview_px := 2048     # чёткое превью (строится в фоне при первом открытии большой карты)
 @export var small_view_m := 420.0     # сколько метров видно на маленькой карте
 @export var min_view_m := 60.0        # максимальное приближение большой карты
 @export var big_margin := 40.0
@@ -35,30 +36,72 @@ var _color_i := 0
 var _next_n := 1
 var _hover_m := Vector2.ZERO
 var _prev_mouse := Input.MOUSE_MODE_CAPTURED   # режим мыши до открытия большой карты
+var _hi_state := 0                              # чёткое превью: 0 не строилось, 1 строится, 2 готово
+var _road_cols := {}
+var _road_w := {}
+var _river_boxes: Array[Rect2] = []             # габариты рек/дорог: быстро отсекать невидимые
+var _road_boxes: Array[Rect2] = []
+var _river_w := PackedFloat32Array()
+
+const RIVER_COL := Color(0.2, 0.45, 0.85)
+const TOWN_COLS: Array[Color] = [Color(1.0, 0.85, 0.2), Color(1.0, 0.55, 0.1), Color(1.0, 0.25, 0.2)]
+const TOWN_NAMES: Array[String] = ["Деревня", "Посёлок", "Город"]
+const POI_NAMES := {"farm": "Ферма", "cabin": "Хижина", "gas": "Заправка"}
+const POI_COL := Color(0.75, 0.2, 0.9)
 
 
 func _ready() -> void:
+	add_to_group("minimap")
 	custom_minimum_size = map_size
 	size = map_size
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
 	get_viewport().size_changed.connect(_apply_layout)
+	_road_cols = {RoadNet.ASPHALT: Color(0.1, 0.1, 0.11), RoadNet.CONCRETE: Color(0.85, 0.85, 0.85),
+		RoadNet.GRAVEL: Color(0.66, 0.55, 0.38), RoadNet.ROADSAND: Color(0.93, 0.83, 0.5)}
+	_road_w = {RoadNet.ASPHALT: 8.0, RoadNet.CONCRETE: 7.0, RoadNet.GRAVEL: 5.0, RoadNet.ROADSAND: 4.0}
 	_apply_layout()
 	for m: Dictionary in marks:
 		_next_n = maxi(_next_n, int(m["n"]) + 1)
+	_lift_to_layer.call_deferred()
+
+
+## Карта — в своём слое выше HUD (здоровье, хотбар, компас не рисуются поверх неё).
+func _lift_to_layer() -> void:
+	var par := get_parent()
+	if par == null or par is CanvasLayer:
+		return
+	var cl := CanvasLayer.new()
+	cl.name = "MapLayer"
+	cl.layer = 30
+	par.add_child(cl)
+	reparent(cl, false)
+	_apply_layout()
 
 
 func setup(w: WorldMap) -> void:
 	world = w
 	world_size = float(w.size)
+	_river_boxes.clear()
+	_road_boxes.clear()
 	_build()
 
 
 func _build() -> void:
 	if world == null:
 		return
-	var img: Image = await world.render_preview(preview_px)
+	var img: Image = await world.render_preview(preview_px, get_tree(), false)
+	if _hi_state != 2:
+		map_texture = ImageTexture.create_from_image(img)
+	queue_redraw()
+
+
+## Чёткое превью в фоне (без зависания кадров): подменяет быстрое, когда готово.
+func _build_hi() -> void:
+	_hi_state = 1
+	var img: Image = await world.render_preview(hi_preview_px, get_tree(), false)
 	map_texture = ImageTexture.create_from_image(img)
+	_hi_state = 2
 	queue_redraw()
 
 
@@ -102,6 +145,8 @@ func _set_expanded(on: bool) -> void:
 		_follow = true
 		_prev_mouse = Input.mouse_mode
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		if _hi_state == 0 and map_texture != null and world != null:
+			_build_hi()
 	elif not TouchControls.active():
 		Input.mouse_mode = _prev_mouse   # как было до открытия (захвачена или освобождена по Esc)
 	_apply_layout()
@@ -268,6 +313,8 @@ func _draw() -> void:
 	var player := _get_player()
 	var ppos := Vector2(player.global_position.x, player.global_position.z) if player != null else Vector2.ZERO
 	var rect := Rect2(Vector2.ZERO, size)
+	if world != null and world.roads != null:
+		_draw_world_overlays()
 
 	for node in markers:
 		if is_instance_valid(node):
@@ -283,6 +330,91 @@ func _draw() -> void:
 		_draw_player(player, rect)
 
 	_draw_frame()
+
+
+## Реки, дороги, города и точки интереса — векторно поверх рельефа (чёткие при любом приближении).
+func _draw_world_overlays() -> void:
+	var s := _scale()
+	var o := _origin()
+	var vis := Rect2(o, size / s).grow(30.0)
+	if _river_boxes.is_empty():
+		_build_boxes()
+	var rivers: Array = world.hydro.rivers
+	for i in rivers.size():
+		var pts: PackedVector2Array = rivers[i]["pts"]
+		if pts.size() < 2 or not vis.intersects(_river_boxes[i]):
+			continue
+		var w := clampf(_river_w[i] * 2.0 * s, 1.5, 16.0)
+		draw_polyline(_to_screen(pts, o, s), RIVER_COL, w, true)
+	var paths: Array = world.roads.link_paths
+	for pass_i in 2:   # сначала тёмный контур всех дорог, потом заливка — перекрёстки читаются чище
+		for i in paths.size():
+			var lp: Dictionary = paths[i]
+			var pts: PackedVector2Array = lp["pts"]
+			if pts.size() < 2 or not vis.intersects(_road_boxes[i]):
+				continue
+			var mat: Variant = lp["mat"]
+			var w := clampf(float(_road_w.get(mat, 5.0)) * s, 1.8, 11.0)
+			var sp := _to_screen(pts, o, s)
+			if pass_i == 0:
+				draw_polyline(sp, Color(0, 0, 0, 0.75), w + 2.5, true)
+			else:
+				draw_polyline(sp, _road_cols.get(mat, Color.GRAY), w, true)
+	var expanded_close := expanded and _view_m <= 1800.0
+	for t: Dictionary in world.roads.towns:
+		var tier := clampi(int(t["tier"]), 0, 2)
+		var c := _world_to_local(t["center"])
+		var rr := float(t["radius"]) * s
+		if not Rect2(Vector2.ZERO, size).grow(rr + 30.0).has_point(c):
+			continue
+		var col := TOWN_COLS[tier]
+		draw_circle(c, rr, Color(col.r, col.g, col.b, 0.16))
+		draw_arc(c, rr, 0.0, TAU, 48, Color(col.r, col.g, col.b, 0.7), 1.5, true)
+		var half := (5.0 + tier * 2.0) * (1.4 if expanded else 1.0)
+		draw_rect(Rect2(c - Vector2.ONE * (half + 2.0), Vector2.ONE * (half + 2.0) * 2.0), Color.BLACK)
+		draw_rect(Rect2(c - Vector2.ONE * half, Vector2.ONE * half * 2.0), col)
+		if expanded_close:
+			_label(c + Vector2(0, half + 18.0), TOWN_NAMES[tier], 16, true)
+	for t: Dictionary in world.roads.pois:
+		var c := _world_to_local(t["center"])
+		if not Rect2(Vector2.ZERO, size).grow(20.0).has_point(c):
+			continue
+		var half := 5.0 if expanded else 3.5
+		draw_rect(Rect2(c - Vector2.ONE * (half + 1.5), Vector2.ONE * (half + 1.5) * 2.0), Color.BLACK)
+		draw_rect(Rect2(c - Vector2.ONE * half, Vector2.ONE * half * 2.0), POI_COL)
+		if expanded and _view_m <= 900.0:
+			_label(c + Vector2(0, half + 15.0), POI_NAMES.get(String(t["poi_type"]), "Склад"), 13, true)
+
+
+## Габариты каждой реки и дороги (один раз): невидимые в текущем окне пропускаются без обхода точек.
+func _build_boxes() -> void:
+	_river_boxes.clear()
+	_road_boxes.clear()
+	_river_w.clear()
+	for rv: Dictionary in world.hydro.rivers:
+		_river_boxes.append(_box_of(rv["pts"]))
+		var hw: PackedFloat32Array = rv["hw"]
+		var sum := 0.0
+		for v in hw:
+			sum += v
+		_river_w.append(sum / maxf(hw.size(), 1.0))   # средняя полуширина русла, м
+	for lp: Dictionary in world.roads.link_paths:
+		_road_boxes.append(_box_of(lp["pts"]))
+
+
+func _box_of(pts: PackedVector2Array) -> Rect2:
+	var r := Rect2(pts[0], Vector2.ZERO) if pts.size() > 0 else Rect2()
+	for p in pts:
+		r = r.expand(p)
+	return r
+
+
+func _to_screen(pts: PackedVector2Array, o: Vector2, s: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	out.resize(pts.size())
+	for i in pts.size():
+		out[i] = (pts[i] - o) * s
+	return out
 
 
 func _draw_mark(m: Dictionary, rect: Rect2, ppos: Vector2, has_player: bool) -> void:
