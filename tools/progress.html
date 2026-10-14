@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Загрузка 77Days</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#6b6b6b;--card:#f4f3ef;--acc:#2f6fdb;--ok:#2e7d32;--line:#e2e0d9}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--fg:#eee;--mut:#9a9a94;--card:#2a2a27;--acc:#6ea0f5;--ok:#6fbf73;--line:#3a3a36}}
+body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:15px system-ui,sans-serif}
+.w{max-width:620px;margin:auto}h1{font-size:20px;font-weight:500;margin:0 0 16px}
+.b{background:var(--card);border-radius:8px;height:14px;overflow:hidden}
+.f{height:100%;background:var(--acc);width:0;transition:width .8s}
+.row{display:flex;justify-content:space-between;margin:6px 0 20px;color:var(--mut);font-size:13px}
+.st{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.st:last-child{border:0}
+.d{width:12px;height:12px;border-radius:50%;background:var(--line);margin-top:4px;flex:none}
+.on .d{background:var(--acc);animation:p 1s infinite alternate}.done .d{background:var(--ok)}
+@keyframes p{to{opacity:.3}}small{display:block;color:var(--mut)}
+</style></head><body><div class="w">
+<h1>Загрузка проекта на GitHub</h1>
+<div class="b"><div class="f" id="f"></div></div>
+<div class="row"><span id="pct">0%</span><span id="info"></span></div>
+<div id="steps"></div>
+<small id="t" style="margin-top:12px;color:var(--mut)"></small>
+</div><script>
+const S=[["Подготовка файлов (git add)"],["Коммит"],["Отправка на GitHub (push)"]];
+let phase=0,hasPush=false;
+async function tick(){
+ try{
+  const s=await (await fetch('/status',{cache:'no-store'})).json();
+  const addPct=Math.min(99,Math.round(s.newObjects/s.totalFiles*100));
+  let total=0,cur=0,detail=['','',''];
+  if(s.pushPct!==null||s.pushTail){hasPush=true}
+  if(hasPush){cur=2;total=33+Math.round((s.pushPct||0)*0.67);detail[2]=s.pushTail}
+  else if(s.gitRunning&&s.lock){cur=0;total=Math.round(addPct*0.33);detail[0]='Новых объектов: '+s.newObjects+' из ~'+s.totalFiles+' ('+s.newMB+' МБ)'}
+  else if(s.gitRunning){cur=1;total=33}
+  else if(phase>0){cur=3;total=100}
+  if(hasPush&&s.pushPct===100&&!s.gitRunning){cur=3;total=100}
+  phase=Math.max(phase,cur);
+  document.getElementById('f').style.width=total+'%';
+  document.getElementById('pct').textContent=total+'%';
+  document.getElementById('info').textContent=s.gitRunning?'git работает, CPU '+s.cpu+' с':'git не запущен';
+  document.getElementById('steps').innerHTML=S.map((x,i)=>'<div class="st '+(i<cur?'done':i==cur?'on':'')+'"><div class="d"></div><div>'+x[0]+'<small>'+detail[i]+'</small></div></div>').join('');
+  document.getElementById('t').textContent='Обновлено '+s.time+' · процент git add приблизительный';
+ }catch(e){document.getElementById('t').textContent='Сервер недоступен'}
+}
+tick();setInterval(tick,1500);
+</script></body></html>

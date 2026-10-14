@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Диктофон зомби</title>
+<!-- Диктофон для озвучки зомби 77Days. Открыть в Chrome/Edge (двойной клик по файлу).
+     Пробел (удерживать) — запись, отпустить — файл сохраняется в выбранную папку (assets/src/voice) как
+     <зомби>_<категория>_<NN>.wav (моно, 24 бит). Обработку и раскладку в assets/sounds делает Claude. -->
+<style>
+:root {
+  --bg: #121417; --panel: #1b1e23; --panel2: #23272e; --line: #2f343c;
+  --text: #e6e8eb; --dim: #8b929c; --accent: #c9a227; --rec: #e5484d; --ok: #46a758; --warn: #e5932f;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3f4f6; --panel: #ffffff; --panel2: #eef0f3; --line: #d9dde3;
+    --text: #1d2026; --dim: #626a75; --accent: #a8820f; --rec: #d93036; --ok: #2f8a43; --warn: #c26a12;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+h1 { font-size: 17px; margin: 0 12px 0 0; font-weight: 650; }
+button, select { font: inherit; color: var(--text); background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--dim); }
+button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+.status { color: var(--dim); font-size: 13px; }
+.status b { color: var(--text); font-weight: 600; }
+main { display: grid; grid-template-columns: minmax(260px, 360px) 1fr; gap: 16px; padding: 16px; max-width: 1200px; margin: 0 auto; }
+@media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tabs button { flex: 1; }
+.tabs button.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.cat { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+.cat:hover { background: var(--panel2); }
+.cat.on { background: var(--panel2); border-color: var(--accent); }
+.cat .nm { font-weight: 600; }
+.cat .cnt { font-variant-numeric: tabular-nums; color: var(--dim); }
+.cat .cnt.done { color: var(--ok); }
+.cat .hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--dim); }
+.cat.on .hint { color: var(--text); }
+.opt { font-size: 12px; color: var(--dim); margin-left: 4px; }
+.stage { display: flex; flex-direction: column; gap: 14px; }
+.now { font-size: 13px; color: var(--dim); }
+.now .file { font-family: ui-monospace, Consolas, monospace; color: var(--text); font-size: 15px; }
+.now .task { font-size: 20px; color: var(--text); font-weight: 600; margin: 4px 0 2px; }
+#rec { width: 100%; height: 120px; border-radius: 14px; font-size: 20px; font-weight: 650; border: 2px solid var(--line); background: var(--panel2); user-select: none; touch-action: none; }
+#rec.live { background: var(--rec); border-color: var(--rec); color: #fff; }
+.meter { height: 14px; background: var(--panel2); border-radius: 7px; overflow: hidden; position: relative; border: 1px solid var(--line); }
+.meter i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ok); transition: width 0.05s linear; }
+.meter i.hot { background: var(--warn); }
+.meter i.clip { background: var(--rec); }
+.meter .mark { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--dim); opacity: 0.6; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+canvas { width: 100%; height: 90px; background: var(--panel2); border-radius: 8px; border: 1px solid var(--line); display: block; }
+.take { font-size: 13px; color: var(--dim); }
+.take b { color: var(--text); }
+.bad { color: var(--rec) !important; font-weight: 600; }
+.meh { color: var(--warn) !important; font-weight: 600; }
+.keys { font-size: 12.5px; color: var(--dim); }
+kbd { font: 12px ui-monospace, Consolas, monospace; background: var(--panel2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: var(--text); }
+label { font-size: 13px; color: var(--dim); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+#log { font-size: 12.5px; color: var(--dim); max-height: 120px; overflow: auto; font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙 Диктофон зомби</h1>
+  <button id="pick" class="primary">Выбрать папку…</button>
+  <button id="resume" hidden>Продолжить в «<span id="resumeName"></span>»</button>
+  <span class="status" id="folder">Папка не выбрана — выбери <b>D:\77Days\assets\src\voice</b> (создай её)</span>
+  <span style="flex:1"></span>
+  <select id="mic" title="Микрофон"></select>
+</header>
+
+<main>
+  <section class="card">
+    <div class="tabs" id="tabs"></div>
+    <div id="cats"></div>
+  </section>
+
+  <section class="card stage">
+    <div class="now">
+      <div>Сейчас записываем:</div>
+      <div class="task" id="task">—</div>
+      <div id="taskHint"></div>
+      <div style="margin-top:6px">Следующий файл: <span class="file" id="next">—</span></div>
+    </div>
+
+    <button id="rec">Удерживай <kbd>Пробел</kbd> или эту кнопку</button>
+
+    <div>
+      <div class="meter"><i id="lvl"></i><span class="mark" style="left:50%" title="−6 дБ"></span></div>
+      <div class="take" id="micState" style="margin-top:4px">Микрофон ещё не включён — нажми пробел или кнопку записи</div>
+      <div class="take">Пики держи около середины (−6 дБ). Красный — перегруз, такой дубль лучше перезаписать.</div>
+    </div>
+
+    <div>
+      <canvas id="wave" width="1200" height="180"></canvas>
+      <div class="row" style="margin-top:8px">
+        <span class="take" id="takeInfo">Последний дубль: —</span>
+        <span style="flex:1"></span>
+        <button id="play" disabled>▶ Прослушать <kbd>P</kbd></button>
+        <button id="del" disabled>✕ Удалить <kbd>Del</kbd></button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="room">Записать тишину комнаты (5 с)</button>
+      <label><input type="checkbox" id="autoplay"> прослушивать после записи</label>
+      <label><input type="checkbox" id="advance" checked> дальше, когда набрано</label>
+    </div>
+
+    <div class="keys">
+      <kbd>Пробел</kbd> удерживать — запись ·
+      <kbd>↑</kbd><kbd>↓</kbd> категория ·
+      <kbd>1</kbd><kbd>2</kbd> зомби ·
+      <kbd>P</kbd> прослушать ·
+      <kbd>Del</kbd> удалить последний
+    </div>
+    <div id="log"></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+// --- что записываем: категории из плана озвучки (n — сколько дублей нужно) -------------------------------
+const ZOMBIES = {
+  friend: {
+    title: "friend — жёлтая куртка",
+    voice: "Низкий, грудной, «мокрый», медленный. Тяжёлый сутулый мертвец.",
+    cats: [
+      ["groan", "Стон (бродит)", 10, "1–3 с. Протяжный низкий стон, можно на вдохе. Без спешки."],
+      ["alert", "Заметил игрока", 4, "0.5–1.5 с. Резкий вдох и рык: «ххх-ГРРА»."],
+      ["chase", "Погоня", 6, "1–2 с. Злой рык с тяжёлым дыханием, на ходу."],
+      ["attack", "Удар", 8, "0.3–0.8 с. Усилие при замахе: «х-ХА!», «ГХА»."],
+      ["hurt", "Попадание", 8, "0.2–0.6 с. Короткий вскрик-хрип от удара."],
+      ["death", "Смерть", 4, "1–2.5 с. Предсмертный хрип, затухающий в выдох."],
+      ["sleep", "Спит", 3, "2–4 с. Медленное сиплое дыхание, булькает.", true],
+    ],
+  },
+  mudworn: {
+    title: "mudworn — с рюкзаком",
+    voice: "Выше, хриплый, нервный: шипение, щелчки языком, короткие рывки. Хищник.",
+    cats: [
+      ["groan", "Стон (бродит)", 10, "1–3 с. Хриплое ворчание с щелчками, рваное дыхание."],
+      ["alert", "Заметил игрока", 4, "0.5–1.5 с. Резкое шипение и короткий визг-рык."],
+      ["chase", "Погоня", 6, "1–2 с. Быстрое хищное рычание, частое дыхание."],
+      ["attack", "Удар/бросок", 8, "0.3–0.8 с. Короткий рывок: «ГХА!», «КХХ!»."],
+      ["hurt", "Попадание", 8, "0.2–0.6 с. Взвизг-хрип."],
+      ["death", "Смерть", 4, "1–2.5 с. Хрип с бульканьем, обрывается."],
+      ["crouch", "Присел перед прыжком", 5, "~1 с. Шипение и клёкот сквозь зубы, нарастает."],
+      ["leap", "Прыжок", 5, "0.5–1 с. Визг или рёв в полёте. Громкость не на полную — подниму сам."],
+      ["sleep", "Спит", 3, "2–4 с. Сиплое дыхание с редкими щелчками.", true],
+    ],
+  },
+};
+const PRE_ROLL = 0.35;   // с: запись начинается чуть раньше нажатия (не съедается начало звука)
+const POST_ROLL = 0.25;  // с: и заканчивается чуть позже отпускания
+const MIN_TAKE = 0.25;   // с: короче — случайное нажатие, не сохраняется
+
+const $ = (id) => document.getElementById(id);
+const logEl = $("log");
+function log(msg, cls) {
+  const d = document.createElement("div");
+  d.textContent = new Date().toLocaleTimeString() + "  " + msg;
+  if (cls) d.className = cls;
+  logEl.prepend(d);
+}
+
+let zombie = "friend";
+let catIdx = 0;
+let dir = null;                 // FileSystemDirectoryHandle
+const counts = {};              // "friend_groan" -> сколько файлов
+const nextNum = {};             // "friend_groan" -> следующий номер
+const saved = [];               // стек сохранённых: {name, samples}
+
+// --- папка: выбор, запоминание между сеансами (IndexedDB), подсчёт уже записанного ---------------------------
+function idb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("zombie_voice", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function kvSet(k, v) {
+  try { const db = await idb(); db.transaction("kv", "readwrite").objectStore("kv").put(v, k); } catch (e) {}
+}
+async function kvGet(k) {
+  try {
+    const db = await idb();
+    return await new Promise((res) => { const r = db.transaction("kv").objectStore("kv").get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(null); });
+  } catch (e) { return null; }
+}
+
+async function useDir(h) {
+  dir = h;
+  for (const k in counts) delete counts[k];
+  for (const k in nextNum) delete nextNum[k];
+  for await (const [name] of dir.entries()) {
+    const m = /^([a-z]+)_([a-z]+)_(\d+)\.wav$/.exec(name);
+    if (!m) continue;
+    const key = m[1] + "_" + m[2];
+    counts[key] = (counts[key] || 0) + 1;
+    nextNum[key] = Math.max(nextNum[key] || 1, parseInt(m[3], 10) + 1);
+  }
+  $("folder").innerHTML = "Сохраняю в папку <b>" + dir.name + "</b>";
+  $("resume").hidden = true;
+  kvSet("dir", dir);
+  render();
+  log("Папка «" + dir.name + "»: найдено файлов " + Object.values(counts).reduce((a, b) => a + b, 0));
+}
+
+$("pick").onclick = async () => {
+  if (!window.showDirectoryPicker) {
+    alert("Этот браузер не умеет сохранять в папку. Открой файл в Chrome или Edge — иначе файлы уйдут в «Загрузки».");
+    return;
+  }
+  try { await useDir(await window.showDirectoryPicker({ id: "zombie-voice", mode: "readwrite" })); }
+  catch (e) { if (e.name !== "AbortError") log("Папка: " + e.message, "bad"); }
+};
+$("resume").onclick = async () => {
+  const h = await kvGet("dir");
+  if (h && (await h.requestPermission({ mode: "readwrite" })) === "granted") await useDir(h);
+};
+(async () => {
+  const h = await kvGet("dir");
+  if (h && h.requestPermission) {
+    $("resumeName").textContent = h.name;
+    $("resume").hidden = false;
+  }
+})();
+
+// --- список категорий -----------------------------------------------------------------------------------------
+function key(z, c) { return z + "_" + c; }
+function cats() { return ZOMBIES[zombie].cats; }
+function fileName(z, c) { return key(z, c) + "_" + String(nextNum[key(z, c)] || 1).padStart(2, "0") + ".wav"; }
+
+function render() {
+  const tabs = $("tabs");
+  tabs.innerHTML = "";
+  Object.keys(ZOMBIES).forEach((z, i) => {
+    const b = document.createElement("button");
+    b.textContent = (i + 1) + ". " + ZOMBIES[z].title;
+    b.className = z === zombie ? "on" : "";
+    b.onclick = () => { zombie = z; catIdx = 0; render(); };
+    tabs.appendChild(b);
+  });
+  const box = $("cats");
+  box.innerHTML = "";
+  const v = document.createElement("div");
+  v.className = "take";
+  v.style.margin = "0 4px 8px";
+  v.textContent = "Голос: " + ZOMBIES[zombie].voice;
+  box.appendChild(v);
+  cats().forEach(([id, nm, n, hint, opt], i) => {
+    const have = counts[key(zombie, id)] || 0;
+    const d = document.createElement("div");
+    d.className = "cat" + (i === catIdx ? " on" : "");
+    d.innerHTML = `<span class="nm"></span><span class="cnt ${have >= n ? "done" : ""}">${have} / ${n}</span><span class="hint"></span>`;
+    d.querySelector(".nm").textContent = nm;
+    if (opt) d.querySelector(".nm").insertAdjacentHTML("beforeend", '<span class="opt">по желанию</span>');
+    d.querySelector(".hint").textContent = hint;
+    d.onclick = () => { catIdx = i; render(); };
+    box.appendChild(d);
+  });
+  const [id, nm, n, hint] = cats()[catIdx];
+  $("task").textContent = nm + "  (" + (counts[key(zombie, id)] || 0) + " из " + n + ")";
+  $("taskHint").textContent = hint;
+  $("next").textContent = fileName(zombie, id);
+}
+
+// --- звук ------------------------------------------------------------------------------------------------------
+// Запись — MediaRecorder прямо с микрофона (мимо Web Audio: там звук идёт по часам устройства вывода, и при разных
+// устройствах ввода/вывода в записи появляются провалы и повторы). Рекордер пишет непрерывно и перезапускается
+// между дублями — так у дубля есть «пред-запись» до нажатия. Web Audio — только для индикатора уровня и расшифровки.
+let ctx = null, stream = null, src = null, analyser = null;
+let sr = 48000;
+let mr = null, mrMime = "";
+let recording = false, stopping = null;
+let level = 0;
+let fixedTake = null;            // запись тишины фиксированной длины
+
+async function listMics() {
+  try {
+    const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput");
+    const sel = $("mic");
+    const cur = sel.value;
+    sel.innerHTML = "";
+    devs.forEach((d, i) => {
+      const o = document.createElement("option");
+      o.value = d.deviceId;
+      o.textContent = d.label || "Микрофон " + (i + 1);
+      sel.appendChild(o);
+    });
+    if (cur) sel.value = cur;
+  } catch (e) {}
+}
+
+// AudioContext создаётся синхронно в обработчике нажатия (иначе Chrome может оставить его на паузе)
+function makeCtx() {
+  if (ctx) return;
+  ctx = new AudioContext();
+  sr = ctx.sampleRate;
+}
+
+function pickMime() {
+  for (const t of ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/webm", "audio/mp4"]) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return "";
+}
+
+// новый рекордер; предыдущий (если есть) возвращается вызывающему, чтобы остановить и забрать запись
+function startRecorder() {
+  const r = new MediaRecorder(stream, mrMime ? { mimeType: mrMime, audioBitsPerSecond: 256000 } : undefined);
+  r._chunks = [];
+  r._t0 = performance.now();
+  r.ondataavailable = (e) => { if (e.data && e.data.size) r._chunks.push(e.data); };
+  r.onstart = () => { r._t0 = performance.now(); };
+  r.start();
+  const old = mr;
+  mr = r;
+  return old;
+}
+
+function stopRecorder(r) {
+  return new Promise((res) => {
+    if (!r || r.state === "inactive") { res(r && r._chunks.length ? new Blob(r._chunks, { type: r.mimeType }) : null); return; }
+    r.onstop = () => res(new Blob(r._chunks, { type: r.mimeType }));
+    r.stop();
+  });
+}
+
+async function startAudio(deviceId) {
+  makeCtx();
+  if (mr) { const old = mr; mr = null; stopRecorder(old); }
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      deviceId: deviceId ? { exact: deviceId } : undefined,
+      channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+    },
+  });
+  mrMime = pickMime();
+  startRecorder();
+  // индикатор уровня
+  if (src) src.disconnect();
+  src = ctx.createMediaStreamSource(stream);
+  if (!analyser) {
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    const mute = ctx.createGain();
+    mute.gain.value = 0;
+    analyser.connect(mute).connect(ctx.destination);
+  }
+  src.connect(analyser);
+  if (ctx.state !== "running") { try { await ctx.resume(); } catch (e) {} }
+  await listMics();
+  const s = stream.getAudioTracks()[0].getSettings();
+  log("Микрофон: " + (stream.getAudioTracks()[0].label || "по умолчанию") + (s.sampleRate ? ", " + s.sampleRate + " Гц" : "") + ", запись " + (mrMime || "по умолчанию"));
+}
+
+// пока не пишем дубль — рекордер перезапускается раз в 20 с (не копит длинную запись); новый стартует до остановки старого
+setInterval(() => {
+  const st = $("micState");
+  if (!stream) { st.textContent = "Микрофон ещё не включён — нажми пробел или кнопку записи"; st.className = "take"; return; }
+  const tr = stream.getAudioTracks()[0];
+  if (!tr || tr.readyState === "ended") { st.textContent = "Микрофон отключился — выбери его снова в списке справа вверху"; st.className = "take bad"; return; }
+  if (!recording && !stopping && mr && performance.now() - mr._t0 > 20000) stopRecorder(startRecorder());
+  st.textContent = "Микрофон работает · запись напрямую с микрофона" + (ctx && ctx.state !== "running" ? " · индикатор на паузе (кликни по странице)" : "");
+  st.className = "take";
+}, 500);
+
+function meterLoop() {
+  if (analyser) {
+    const b = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(b);
+    let pk = 0;
+    for (let i = 0; i < b.length; i++) { const a = Math.abs(b[i]); if (a > pk) pk = a; }
+    level = Math.max(pk, level * 0.85);
+  }
+  const db = level > 1e-5 ? 20 * Math.log10(level) : -90;
+  const w = Math.max(0, Math.min(1, (db + 48) / 48));     // −48…0 дБ
+  const el = $("lvl");
+  el.style.width = (w * 100).toFixed(1) + "%";
+  el.className = level > 0.97 ? "clip" : level > 0.6 ? "hot" : "";
+  requestAnimationFrame(meterLoop);
+}
+requestAnimationFrame(meterLoop);
+
+async function ensureAudio() {
+  makeCtx();
+  const resumed = ctx.state !== "running" ? ctx.resume() : null;   // в том же обработчике нажатия
+  if (!stream) await startAudio($("mic").value || undefined);
+  if (resumed) { try { await Promise.race([resumed, new Promise((r) => setTimeout(r, 500))]); } catch (e) {} }
+}
+
+// --- запись ------------------------------------------------------------------------------------------------
+let pressAt = 0, held = false;
+
+async function begin() {
+  if (recording && !stopping) return;
+  held = true;
+  pressAt = performance.now();
+  if (!stream) {
+    // первое нажатие: включаем микрофон (браузер спросит разрешение) — запись начнётся со следующего нажатия
+    try { await ensureAudio(); log("Микрофон включён — теперь держи пробел для записи"); }
+    catch (e) { log("Нет доступа к микрофону: " + e.message, "bad"); }
+    return;
+  }
+  try { await ensureAudio(); } catch (e) { log("Звук: " + e.message, "bad"); return; }
+  if (!held) return;            // успели отпустить, пока включался звук
+  if (stopping) { clearTimeout(stopping.t); stopping.go(); }
+  pressAt = performance.now();
+  recording = true;
+  $("rec").classList.add("live");
+  $("rec").textContent = "● Запись…  отпусти, чтобы сохранить";
+}
+
+function end() {
+  held = false;
+  if (!recording || stopping || fixedTake) return;
+  const name = fileName(zombie, cats()[catIdx][0]);
+  const relAt = performance.now();
+  const heldSec = (relAt - pressAt) / 1000;
+  if (heldSec < MIN_TAKE) {
+    recording = false;
+    resetBtn();
+    log("Слишком коротко (" + heldSec.toFixed(2) + " с) — держи дольше", "meh");
+    return;
+  }
+  const t0 = pressAt;
+  const go = () => { stopping = null; recording = false; resetBtn(); finish(name, t0, relAt + POST_ROLL * 1000); };
+  stopping = { go, t: setTimeout(go, POST_ROLL * 1000) };
+}
+
+function resetBtn() {
+  $("rec").classList.remove("live");
+  $("rec").innerHTML = "Удерживай <kbd>Пробел</kbd> или эту кнопку";
+}
+
+// дубль: остановить текущий рекордер (сразу запустив следующий), расшифровать, вырезать [нажатие − PRE_ROLL, отпускание + POST_ROLL]
+async function finish(name, t0, t1) {
+  const r = startRecorder();
+  const blob = await stopRecorder(r);
+  if (!blob || !blob.size) { log("Пустая запись — микрофон не дал звук. Не сохранено.", "bad"); return; }
+  let buf;
+  try { buf = await ctx.decodeAudioData(await blob.arrayBuffer()); }
+  catch (e) { log("Не удалось расшифровать запись: " + e.message, "bad"); return; }
+  sr = buf.sampleRate;
+  const all = buf.getChannelData(0);
+  const a = Math.max(0, Math.round(((t0 - r._t0) / 1000 - PRE_ROLL) * sr));
+  const b = Math.min(all.length, Math.round(((t1 - r._t0) / 1000) * sr));
+  if (b - a < sr * MIN_TAKE) { log("Запись оказалась пустой (" + ((b - a) / sr).toFixed(2) + " с). Не сохранено.", "bad"); return; }
+  save(name, all.slice(a, b));
+}
+
+function wav24(s) {
+  const n = s.length;
+  const buf = new ArrayBuffer(44 + n * 3);
+  const v = new DataView(buf);
+  const str = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + n * 3, true); str(8, "WAVE");
+  str(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 3, true); v.setUint16(32, 3, true); v.setUint16(34, 24, true);
+  str(36, "data"); v.setUint32(40, n * 3, true);
+  let o = 44;
+  for (let i = 0; i < n; i++) {
+    const x = Math.round(Math.max(-1, Math.min(1, s[i])) * 8388607);
+    v.setUint8(o, x & 255); v.setUint8(o + 1, (x >> 8) & 255); v.setUint8(o + 2, (x >> 16) & 255);
+    o += 3;
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+async function save(name, samples) {
+  const blob = wav24(samples);
+  try {
+    if (dir) {
+      const fh = await dir.getFileHandle(name, { create: true });
+      const w = await fh.createWritable();
+      await w.write(blob);
+      await w.close();
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
+  } catch (e) { log("Не сохранилось " + name + ": " + e.message, "bad"); return; }
+  saved.push({ name, samples });
+  const m = /^([a-z]+_[a-z]+)_(\d+)\.wav$/.exec(name);
+  if (m) {
+    counts[m[1]] = (counts[m[1]] || 0) + 1;
+    nextNum[m[1]] = Math.max(nextNum[m[1]] || 1, parseInt(m[2], 10) + 1);
+  }
+  showTake(name, samples);
+  log("Сохранено " + name + (dir ? "" : " (в Загрузки)"));
+  // набрали нужное — к следующей категории
+  const [id, , n] = cats()[catIdx];
+  if (m && $("advance").checked && (counts[key(zombie, id)] || 0) === n && catIdx < cats().length - 1) catIdx++;
+  render();
+  if ($("autoplay").checked) play();
+}
+
+function showTake(name, s) {
+  let pk = 0;
+  for (let i = 0; i < s.length; i++) pk = Math.max(pk, Math.abs(s[i]));
+  const db = pk > 1e-5 ? 20 * Math.log10(pk) : -90;
+  let note = "";
+  if (pk > 0.98) note = ' <span class="bad">перегруз — перезапиши (Del)</span>';
+  else if (db < -24) note = ' <span class="meh">тихо — ближе к микрофону</span>';
+  $("takeInfo").innerHTML = `Последний: <b>${name}</b> · ${(s.length / sr).toFixed(2)} с · пик ${db.toFixed(1)} дБ${note}`;
+  $("play").disabled = false;
+  $("del").disabled = false;
+  const c = $("wave"), g = c.getContext("2d");
+  const W = c.width, H = c.height, cs = getComputedStyle(document.body);
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = cs.getPropertyValue("--accent");
+  const step = Math.max(1, Math.floor(s.length / W));
+  for (let x = 0; x < W; x++) {
+    let mn = 0, mx = 0;
+    for (let i = x * step; i < Math.min(s.length, (x + 1) * step); i++) { mn = Math.min(mn, s[i]); mx = Math.max(mx, s[i]); }
+    g.fillRect(x, H / 2 - mx * H / 2, 1, Math.max(1, (mx - mn) * H / 2));
+  }
+  g.fillStyle = cs.getPropertyValue("--rec");
+  g.fillRect(0, 0, W, 2); g.fillRect(0, H - 2, W, 2);
+}
+
+let playing = null;
+function play() {
+  const last = saved[saved.length - 1];
+  if (!last || !ctx) return;
+  if (playing) { try { playing.stop(); } catch (e) {} }
+  const b = ctx.createBuffer(1, last.samples.length, sr);
+  b.copyToChannel(last.samples, 0);
+  playing = ctx.createBufferSource();
+  playing.buffer = b;
+  playing.connect(ctx.destination);
+  playing.start();
+}
+
+async function delLast() {
+  const last = saved.pop();
+  if (!last) return;
+  try { if (dir) await dir.removeEntry(last.name); } catch (e) { log("Не удалось удалить " + last.name + ": " + e.message, "bad"); saved.push(last); return; }
+  const m = /^([a-z]+_[a-z]+)_(\d+)\.wav$/.exec(last.name);
+  if (m) {
+    counts[m[1]] = Math.max(0, (counts[m[1]] || 1) - 1);
+    if (nextNum[m[1]] === parseInt(m[2], 10) + 1) nextNum[m[1]] = parseInt(m[2], 10);
+  }
+  log("Удалено " + last.name + (dir ? "" : " (из Загрузок удали сам)"), "meh");
+  const prev = saved[saved.length - 1];
+  if (prev) showTake(prev.name, prev.samples);
+  else { $("takeInfo").textContent = "Последний дубль: —"; $("play").disabled = true; $("del").disabled = true; $("wave").getContext("2d").clearRect(0, 0, 1200, 180); }
+  render();
+}
+
+$("room").onclick = async () => {
+  try { await ensureAudio(); } catch (e) { log("Нет доступа к микрофону: " + e.message, "bad"); return; }
+  if (recording) return;
+  log("Тишина 5 с — не шуми…");
+  const name = "roomtone_" + Date.now().toString().slice(-6) + ".wav";
+  const t0 = performance.now() + PRE_ROLL * 1000;     // без пред-записи (там мог быть щелчок мыши)
+  fixedTake = true;
+  recording = true;
+  $("rec").classList.add("live");
+  $("rec").textContent = "● Тишина комнаты… 5 с";
+  setTimeout(() => {
+    fixedTake = null;
+    recording = false;
+    resetBtn();
+    finish(name, t0, performance.now());
+  }, 5000 + PRE_ROLL * 1000);
+};
+
+// --- управление ---------------------------------------------------------------------------------------------
+const recBtn = $("rec");
+recBtn.addEventListener("pointerdown", (e) => { recBtn.setPointerCapture(e.pointerId); begin(); });
+recBtn.addEventListener("pointerup", end);
+recBtn.addEventListener("pointercancel", end);
+$("play").onclick = play;
+$("del").onclick = delLast;
+$("mic").onchange = () => startAudio($("mic").value).catch((e) => log(e.message, "bad"));
+
+let spaceDown = false;
+window.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "SELECT") return;
+  if (e.code === "Space") { e.preventDefault(); if (!spaceDown) { spaceDown = true; begin(); } return; }
+  if (e.repeat) return;
+  if (e.code === "ArrowDown") { e.preventDefault(); catIdx = Math.min(cats().length - 1, catIdx + 1); render(); }
+  else if (e.code === "ArrowUp") { e.preventDefault(); catIdx = Math.max(0, catIdx - 1); render(); }
+  else if (e.key === "1" || e.key === "2") { zombie = Object.keys(ZOMBIES)[+e.key - 1]; catIdx = 0; render(); }
+  else if (e.code === "KeyP") play();
+  else if (e.code === "Delete") { e.preventDefault(); delLast(); }
+});
+window.addEventListener("keyup", (e) => { if (e.code === "Space") { e.preventDefault(); spaceDown = false; end(); } });
+window.addEventListener("blur", () => { if (spaceDown) { spaceDown = false; end(); } });
+
+render();
+navigator.mediaDevices && navigator.mediaDevices.enumerateDevices && listMics();
+</script>
+</body>
+</html>

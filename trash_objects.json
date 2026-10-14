@@ -1,0 +1,42 @@
+[
+    {
+        "cells":  [
+                      1,
+                      1,
+                      1
+                  ],
+        "name":  "trash_bag",
+        "prompt":  "trash bag",
+        "kind":  "prop_small"
+    },
+    {
+        "cells":  [
+                      1,
+                      1,
+                      1
+                  ],
+        "name":  "trash_bottle",
+        "prompt":  "crushed plastic bottle",
+        "kind":  "prop_small"
+    },
+    {
+        "cells":  [
+                      1,
+                      1,
+                      1
+                  ],
+        "name":  "trash_rag",
+        "prompt":  "dirty rag",
+        "kind":  "prop_small"
+    },
+    {
+        "cells":  [
+                      1,
+                      1,
+                      1
+                  ],
+        "name":  "trash_ketchup",
+        "prompt":  "ketchup packet",
+        "kind":  "prop_small"
+    }
+]

@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Звуки мира</title>
+<!-- Диктофон звуков мира 77Days (шаги, удары, оружие, двери, фон) с подсказками, как сделать каждый звук.
+     Открыть в Chrome/Edge (двойной клик по файлу). Пробел (удерживать) — запись, отпустить — файл сохраняется в
+     выбранную папку (assets/src/sfx_rec) как <звук>_<NN>.wav (моно, 24 бит); фоновые петли — нажал/нажал.
+     Обработка в assets/sounds: scripts/ai3d/sfx_proc.py. -->
+<style>
+:root {
+  --bg: #121417; --panel: #1b1e23; --panel2: #23272e; --line: #2f343c;
+  --text: #e6e8eb; --dim: #8b929c; --accent: #c9a227; --rec: #e5484d; --ok: #46a758; --warn: #e5932f;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3f4f6; --panel: #ffffff; --panel2: #eef0f3; --line: #d9dde3;
+    --text: #1d2026; --dim: #626a75; --accent: #a8820f; --rec: #d93036; --ok: #2f8a43; --warn: #c26a12;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+h1 { font-size: 17px; margin: 0 12px 0 0; font-weight: 650; }
+button, select { font: inherit; color: var(--text); background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--dim); }
+button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+.status { color: var(--dim); font-size: 13px; }
+.status b { color: var(--text); font-weight: 600; }
+main { display: grid; grid-template-columns: minmax(260px, 360px) 1fr; gap: 16px; padding: 16px; max-width: 1200px; margin: 0 auto; }
+@media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tabs button { flex: 1; }
+.tabs button.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.cat { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+.cat:hover { background: var(--panel2); }
+.cat.on { background: var(--panel2); border-color: var(--accent); }
+.cat .nm { font-weight: 600; }
+.cat .cnt { font-variant-numeric: tabular-nums; color: var(--dim); }
+.cat .cnt.done { color: var(--ok); }
+.cat .hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--dim); }
+.cat.on .hint { color: var(--text); }
+.opt { font-size: 12px; color: var(--dim); margin-left: 4px; }
+.stage { display: flex; flex-direction: column; gap: 14px; }
+.now { font-size: 13px; color: var(--dim); }
+.now .file { font-family: ui-monospace, Consolas, monospace; color: var(--text); font-size: 15px; }
+.now .task { font-size: 20px; color: var(--text); font-weight: 600; margin: 4px 0 2px; }
+#rec { width: 100%; height: 120px; border-radius: 14px; font-size: 20px; font-weight: 650; border: 2px solid var(--line); background: var(--panel2); user-select: none; touch-action: none; }
+#rec.live { background: var(--rec); border-color: var(--rec); color: #fff; }
+.meter { height: 14px; background: var(--panel2); border-radius: 7px; overflow: hidden; position: relative; border: 1px solid var(--line); }
+.meter i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ok); transition: width 0.05s linear; }
+.meter i.hot { background: var(--warn); }
+.meter i.clip { background: var(--rec); }
+.meter .mark { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--dim); opacity: 0.6; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+canvas { width: 100%; height: 90px; background: var(--panel2); border-radius: 8px; border: 1px solid var(--line); display: block; }
+.take { font-size: 13px; color: var(--dim); }
+.take b { color: var(--text); }
+.bad { color: var(--rec) !important; font-weight: 600; }
+.meh { color: var(--warn) !important; font-weight: 600; }
+.keys { font-size: 12.5px; color: var(--dim); }
+kbd { font: 12px ui-monospace, Consolas, monospace; background: var(--panel2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: var(--text); }
+label { font-size: 13px; color: var(--dim); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.tabs { flex-wrap: wrap; }
+.tabs button { flex: 1 1 140px; font-size: 13.5px; }
+.opt.new { color: var(--accent); }
+.howbox { margin-top: 10px; background: var(--panel2); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 8px 12px; }
+.howtitle { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); font-weight: 650; }
+.howbox ul, .tips ul { margin: 6px 0 0; padding-left: 20px; color: var(--text); font-size: 14px; }
+.howbox li, .tips li { margin: 3px 0; }
+.tips { margin-bottom: 10px; font-size: 13px; color: var(--dim); }
+.tips summary { cursor: pointer; padding: 4px; font-weight: 600; color: var(--text); }
+#log { font-size: 12.5px; color: var(--dim); max-height: 120px; overflow: auto; font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🔊 Звуки мира</h1>
+  <button id="pick" class="primary">Выбрать папку…</button>
+  <button id="resume" hidden>Продолжить в «<span id="resumeName"></span>»</button>
+  <span class="status" id="folder">Папка не выбрана — выбери <b>D:\77Days\assets\src\sfx_rec</b> (иначе файлы уйдут в «Загрузки»)</span>
+  <span style="flex:1"></span>
+  <select id="mic" title="Микрофон"></select>
+</header>
+
+<main>
+  <section class="card">
+    <details class="tips">
+      <summary>Как записывать — общие советы</summary>
+      <ul id="tips"></ul>
+    </details>
+    <div class="tabs" id="tabs"></div>
+    <div id="cats"></div>
+  </section>
+
+  <section class="card stage">
+    <div class="now">
+      <div>Сейчас записываем:</div>
+      <div class="task" id="task">—</div>
+      <div id="taskMeta"></div>
+      <div class="howbox">
+        <div class="howtitle">Как сделать этот звук</div>
+        <ul id="how"></ul>
+      </div>
+      <div style="margin-top:6px">Следующий файл: <span class="file" id="next">—</span></div>
+    </div>
+
+    <button id="rec">Удерживай <kbd>Пробел</kbd> или эту кнопку</button>
+
+    <div>
+      <div class="meter"><i id="lvl"></i><span class="mark" style="left:50%" title="−6 дБ"></span></div>
+      <div class="take" id="micState" style="margin-top:4px">Микрофон ещё не включён — нажми пробел или кнопку записи</div>
+      <div class="take">Пики держи около середины (−6 дБ). Красный — перегруз, такой дубль лучше перезаписать.</div>
+    </div>
+
+    <div>
+      <canvas id="wave" width="1200" height="180"></canvas>
+      <div class="row" style="margin-top:8px">
+        <span class="take" id="takeInfo">Последний дубль: —</span>
+        <span style="flex:1"></span>
+        <button id="play" disabled>▶ Прослушать <kbd>P</kbd></button>
+        <button id="del" disabled>✕ Удалить <kbd>Del</kbd></button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="room">Записать тишину комнаты (5 с)</button>
+      <label><input type="checkbox" id="autoplay"> прослушивать после записи</label>
+      <label><input type="checkbox" id="advance" checked> дальше, когда набрано</label>
+    </div>
+
+    <div class="keys">
+      <kbd>Пробел</kbd> удерживать — запись ·
+      <kbd>↑</kbd><kbd>↓</kbd> звук ·
+      <kbd>1</kbd>…<kbd>5</kbd> группа ·
+      <kbd>P</kbd> прослушать ·
+      <kbd>Del</kbd> удалить последний
+    </div>
+    <div id="log"></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+// --- что записываем ------------------------------------------------------------------------------------------
+// id — имя звука в игре (assets/sounds/<id>_<N>), n — сколько дублей, len — длина, game — когда звучит,
+// how — как сделать (фоли: чем и обо что), loop — длинная фоновая запись (нажал — пишет, нажал ещё раз — стоп),
+// isNew — в игре такого звука пока нет (подключу после записи), opt — по желанию.
+const GROUPS = [
+  { title: "Шаги и игрок", items: [
+    { id: "step_grass", title: "Шаги по траве", n: 9, len: "0.2–0.4 с, один шаг", game: "Ходьба по траве и земле.",
+      how: ["Сожми в кулаке пучок сухой травы, сена или соломы — коротко, как будто наступил.",
+            "Ещё лучше: кроссовок на руку и шагни им по коврику, на который насыпана сухая трава.",
+            "Чередуй силу и «пятка/носок», чтобы дубли отличались."] },
+    { id: "step_gravel", title: "Шаги по гравию", n: 9, len: "0.2–0.4 с", game: "Гравий, грунтовки.",
+      how: ["Коробка с гречкой, кошачьим наполнителем или мелкими камешками.",
+            "Дави ботинком (в руке) или кулаком в перчатке, с небольшим проворотом — хруст.",
+            "Микрофон в 20–30 см."] },
+    { id: "step_hard", title: "Шаги по асфальту/бетону", n: 9, len: "0.2–0.4 с", game: "Асфальт, бетон.",
+      how: ["Ботинок с твёрдой подошвой — по плитке или бетонному полу (держи ботинок в руке).",
+            "Пятка, потом носок — двойной стук «ток-ш».",
+            "Можно чуть песка на пол — появится шорох."] },
+    { id: "step_wood", title: "Шаги по дереву", n: 9, len: "0.2–0.5 с", game: "Полы и блоки построек.",
+      how: ["Ботинком по деревянному полу, столу или толстой доске.",
+            "Иногда надави на доску — лёгкий скрип делает шаги «домашними»."] },
+    { id: "player_hurt", title: "Игрок: больно", n: 4, len: "0.3–0.7 с", game: "Игрока ударили.",
+      how: ["Голосом: короткий выдох-стон «кх», «ух», «агх».", "Не кричи — это сдержанная боль, громкость подниму."] },
+    { id: "swing", title: "Взмах (удар мимо)", n: 4, len: "0.2–0.5 с", game: "Взмах оружием или инструментом.",
+      how: ["Резко взмахни прутом, тонкой палкой или ремнём в 30–50 см от микрофона — свист воздуха.",
+            "Не задевай микрофон и не дуй на него."] },
+    { id: "eat", title: "Еда", n: 3, len: "0.5–1.2 с", game: "Игрок ест.",
+      how: ["Откуси и жуй у микрофона: яблоко, морковь, чипсы.", "Пара жеваний на дубль, не больше."] },
+    { id: "drink", title: "Питьё", n: 3, len: "0.8–1.5 с", game: "Игрок пьёт.",
+      how: ["Пара глотков воды из бутылки, микрофон у горла/рта.", "В начале — бульк и плеск бутылки."] },
+  ] },
+  { title: "Удары и добыча", items: [
+    { id: "hit_wood", title: "Удар по дереву", n: 8, len: "0.2–0.6 с", game: "Рубка деревьев, удары по деревянным блокам и дверям.",
+      how: ["Обухом топора или молотком по полену, толстой доске.", "Кулаком по массивной деревянной двери — тоже годится.",
+            "Меняй место удара: торец, середина — звучит по-разному."] },
+    { id: "hit_stone", title: "Удар по камню", n: 8, len: "0.2–0.6 с", game: "Кирка по камню, бетонные блоки.",
+      how: ["Камень о камень, молоток по кирпичу или тротуарной плитке.", "Защити глаза — летят осколки.",
+            "Звонкий щелчок и немного осыпания крошки — хорошо."] },
+    { id: "hit_dirt", title: "Удар по земле", n: 8, len: "0.2–0.5 с", game: "Копание земли лопатой.",
+      how: ["Лопатой или совком в землю/песок (огород, цветочный горшок, ящик с песком).",
+            "Дома: кулаком по мешку с землёй или крупой."] },
+    { id: "hit_flesh", title: "Удар по телу", n: 8, len: "0.15–0.4 с", game: "Попадание по зомби (удар, пуля).",
+      how: ["Классика кино: ударь кулаком или палкой по кочану капусты, сырому куску мяса или курице.",
+            "Мокрое полотенце, скрученное и хлёстко по столу — сочный шлепок.",
+            "Чем «мокрее», тем лучше."] },
+    { id: "rustle", title: "Шорох кустов", n: 7, len: "0.4–1 с", game: "Сбор травы, кусты, проход сквозь листву.",
+      how: ["Потряси пучок веток с листьями или пакет с сухими листьями.", "Можно смятую бумагу — но листья живее."] },
+    { id: "hit_metal", title: "Удар по металлу", n: 6, len: "0.2–0.8 с", game: "Металлические блоки, машины, заборы.", isNew: true,
+      how: ["Гаечный ключ или ложка по кастрюле, трубе, сковородке, батарее.", "Глухой удар (рукой придержать) и звонкий — оба нужны."] },
+    { id: "block_break", title: "Ломается блок/доска", n: 6, len: "0.4–1.2 с", game: "Блок постройки разрушен.", isNew: true,
+      how: ["Ломай у микрофона сухие ветки, карандаши, деревянные шпажки пучком — треск дерева.",
+            "Для «тяжести» в конце урони пару деревяшек на пол."] },
+    { id: "tree_fall", title: "Падает дерево", n: 3, len: "1.5–3 с", game: "Срубленное дерево падает.", isNew: true,
+      how: ["Сначала медленно ломай толстую ветку (скрип и треск), затем брось охапку веток или мешок на пол.",
+            "Можно в два захода — склею сам."] },
+  ] },
+  { title: "Оружие", items: [
+    { id: "gun_shot", title: "Выстрел пистолета", n: 3, len: "0.3–1 с", game: "Выстрел. Сейчас стоит запись из набора — можно оставить.", opt: true,
+      how: ["Резкий хлопок: лопни бумажный пакет или шарик, хлопни двумя досками друг о друга, щёлкни ремнём.",
+            "Отодвинь микрофон на 1–2 м и сделай громкость меньше — иначе перегруз.",
+            "Береги уши! Низы и «бах» добавлю обработкой."] },
+    { id: "gun_reload", title: "Перезарядка", n: 3, len: "1–2 с", game: "Перезарядка пистолета (R).",
+      how: ["Металлические щелчки подряд: вынуть-вставить батарейку в пульт, щёлкнуть степлером, защёлкой ремня.",
+            "Ритм: «клац (магазин вынут) … клац (вставлен) — щёлк-щёлк (затвор)»."] },
+    { id: "gun_dry", title: "Сухой щелчок", n: 3, len: "0.1–0.3 с", game: "Нажал на спуск без патронов.",
+      how: ["Одиночный сухой щелчок: шариковая ручка-автомат, кусачки для ногтей, выключатель."] },
+  ] },
+  { title: "Предметы и двери", items: [
+    { id: "door_open", title: "Дверь открывается", n: 3, len: "0.6–1.5 с", game: "Открыть дверь (E).",
+      how: ["Медленно открой скрипучую дверь шкафа или комнаты, микрофон у петель.", "Щелчок ручки в начале — хорошо."] },
+    { id: "door_close", title: "Дверь закрывается", n: 4, len: "0.4–1 с", game: "Закрыть дверь.",
+      how: ["Прикрой дверь до щелчка — не хлопай со всей силы.", "Микрофон в 1 м, чтобы был слышен «объём»."] },
+    { id: "pickup", title: "Подобрать предмет", n: 4, len: "0.2–0.5 с", game: "Подобрал предмет с земли.", isNew: true,
+      how: ["Схвати с пола куртку или тканевую сумку — шорох ткани.", "Можно добавить лёгкий стук предмета."] },
+    { id: "loot_open", title: "Обыск (рюкзак, ящик)", n: 4, len: "0.5–1.5 с", game: "Открыть рюкзак, ящик, обыскать труп.", isNew: true,
+      how: ["Расстегни молнию рюкзака, порыскай рукой внутри.", "Для ящика: откинь крышку коробки, переложи пару вещей."] },
+  ] },
+  { title: "Природа и фон", items: [
+    { id: "wind_loop", title: "Ветер (фон)", n: 1, len: "30–60 с, непрерывно", game: "Фон днём и ночью, зацикливается.", loop: true,
+      how: ["Лучше всего — на улице или балконе в ветреный день, микрофон укрыт от прямого ветра (носок/поролон на микрофоне).",
+            "Без улицы: веди мягкой тканью по ткани у микрофона, медленно и равномерно, или ровное «ффф/шшш» ртом мимо микрофона.",
+            "Без резких звуков: машины, голоса, щелчки испортят петлю."] },
+    { id: "crickets_loop", title: "Сверчки (ночь)", n: 1, len: "30–60 с, непрерывно", game: "Ночной фон.", loop: true,
+      how: ["Летней ночью у открытого окна или во дворе.", "Сейчас стоит запись из набора — можно оставить."], opt: true },
+    { id: "birds_loop", title: "Птицы (утро/день)", n: 1, len: "30–60 с, непрерывно", game: "Дневной фон.", loop: true,
+      how: ["Утром у открытого окна или в парке.", "Сейчас стоит запись из набора — можно оставить."], opt: true },
+    { id: "crow", title: "Ворона", n: 2, len: "0.5–1.5 с", game: "Редкое карканье вдали.", opt: true,
+      how: ["Записать ворону на улице или прокаркать голосом «КАР» хрипло, издалека (1–2 м от микрофона)."] },
+  ] },
+];
+const TIPS = [
+  "Тихая комната, телефон в беззвучный. Сначала нажми «Тишина комнаты» — по ней уберу фон.",
+  "Микрофон 20–40 см от источника, громкие удары — дальше. Не трогай сам микрофон и стол, на котором он стоит.",
+  "Один звук — один дубль: держи пробел, сделай звук, отпусти.",
+  "Дубли делай разными: сила, место удара, скорость — в игре они чередуются.",
+  "Фоновые (петли): нажми пробел — запись пошла, нажми ещё раз — стоп. 30–60 с без резких звуков.",
+  "Пробуй! Звуки в кино почти всегда делают не тем, что на экране. Прослушай (P), не понравилось — Del.",
+];
+const PRE_ROLL = 0.35;   // с: запись начинается чуть раньше нажатия (не съедается начало звука)
+const POST_ROLL = 0.25;  // с: и заканчивается чуть позже отпускания
+const MIN_TAKE = 0.25;   // с: короче — случайное нажатие, не сохраняется
+
+const $ = (id) => document.getElementById(id);
+const logEl = $("log");
+function log(msg, cls) {
+  const d = document.createElement("div");
+  d.textContent = new Date().toLocaleTimeString() + "  " + msg;
+  if (cls) d.className = cls;
+  logEl.prepend(d);
+}
+
+let group = 0;
+let catIdx = 0;
+let dir = null;                 // FileSystemDirectoryHandle
+const counts = {};              // "step_grass" -> сколько файлов
+const nextNum = {};             // "step_grass" -> следующий номер
+const FILE_RE = /^([a-z_]+?)_(\d+)\.wav$/;
+const saved = [];               // стек сохранённых: {name, samples}
+
+// --- папка: выбор, запоминание между сеансами (IndexedDB), подсчёт уже записанного ---------------------------
+function idb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("world_sfx", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function kvSet(k, v) {
+  try { const db = await idb(); db.transaction("kv", "readwrite").objectStore("kv").put(v, k); } catch (e) {}
+}
+async function kvGet(k) {
+  try {
+    const db = await idb();
+    return await new Promise((res) => { const r = db.transaction("kv").objectStore("kv").get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(null); });
+  } catch (e) { return null; }
+}
+
+async function useDir(h) {
+  dir = h;
+  for (const k in counts) delete counts[k];
+  for (const k in nextNum) delete nextNum[k];
+  for await (const [name] of dir.entries()) {
+    const m = FILE_RE.exec(name);
+    if (!m) continue;
+    counts[m[1]] = (counts[m[1]] || 0) + 1;
+    nextNum[m[1]] = Math.max(nextNum[m[1]] || 1, parseInt(m[2], 10) + 1);
+  }
+  $("folder").innerHTML = "Сохраняю в папку <b>" + dir.name + "</b>";
+  $("resume").hidden = true;
+  kvSet("dir", dir);
+  render();
+  log("Папка «" + dir.name + "»: найдено файлов " + Object.values(counts).reduce((a, b) => a + b, 0));
+}
+
+$("pick").onclick = async () => {
+  if (!window.showDirectoryPicker) {
+    alert("Этот браузер не умеет сохранять в папку. Открой файл в Chrome или Edge — иначе файлы уйдут в «Загрузки».");
+    return;
+  }
+  try { await useDir(await window.showDirectoryPicker({ id: "world-sfx", mode: "readwrite" })); }
+  catch (e) { if (e.name !== "AbortError") log("Папка: " + e.message, "bad"); }
+};
+$("resume").onclick = async () => {
+  const h = await kvGet("dir");
+  if (h && (await h.requestPermission({ mode: "readwrite" })) === "granted") await useDir(h);
+};
+(async () => {
+  const h = await kvGet("dir");
+  if (h && h.requestPermission) {
+    $("resumeName").textContent = h.name;
+    $("resume").hidden = false;
+  }
+})();
+
+// --- список категорий -----------------------------------------------------------------------------------------
+function cats() { return GROUPS[group].items; }
+function cur() { return cats()[catIdx]; }
+function fileName(id) { return id + "_" + String(nextNum[id] || 1).padStart(2, "0") + ".wav"; }
+
+function render() {
+  const tabs = $("tabs");
+  tabs.innerHTML = "";
+  GROUPS.forEach((g, i) => {
+    const b = document.createElement("button");
+    const done = g.items.filter((it) => (counts[it.id] || 0) >= it.n).length;
+    b.textContent = (i + 1) + ". " + g.title + "  " + done + "/" + g.items.length;
+    b.className = i === group ? "on" : "";
+    b.onclick = () => { group = i; catIdx = 0; render(); };
+    tabs.appendChild(b);
+  });
+  const box = $("cats");
+  box.innerHTML = "";
+  cats().forEach((it, i) => {
+    const have = counts[it.id] || 0;
+    const d = document.createElement("div");
+    d.className = "cat" + (i === catIdx ? " on" : "");
+    d.innerHTML = `<span class="nm"></span><span class="cnt ${have >= it.n ? "done" : ""}">${have} / ${it.n}</span><span class="hint"></span>`;
+    d.querySelector(".nm").textContent = it.title;
+    if (it.isNew) d.querySelector(".nm").insertAdjacentHTML("beforeend", '<span class="opt new">новый звук</span>');
+    if (it.loop) d.querySelector(".nm").insertAdjacentHTML("beforeend", '<span class="opt">фон</span>');
+    if (it.opt) d.querySelector(".nm").insertAdjacentHTML("beforeend", '<span class="opt">по желанию</span>');
+    d.querySelector(".hint").textContent = it.len + " · " + it.game;
+    d.onclick = () => { catIdx = i; render(); };
+    box.appendChild(d);
+  });
+  const it = cur();
+  $("task").textContent = it.title + "  (" + (counts[it.id] || 0) + " из " + it.n + ")";
+  $("taskMeta").textContent = it.len + " · в игре: " + it.game;
+  const ul = $("how");
+  ul.innerHTML = "";
+  for (const h of it.how) { const li = document.createElement("li"); li.textContent = h; ul.appendChild(li); }
+  $("next").textContent = fileName(it.id);
+  if (!recording) resetBtn();
+}
+
+// --- звук ------------------------------------------------------------------------------------------------------
+// Запись — MediaRecorder прямо с микрофона (мимо Web Audio: там звук идёт по часам устройства вывода, и при разных
+// устройствах ввода/вывода в записи появляются провалы и повторы). Рекордер пишет непрерывно и перезапускается
+// между дублями — так у дубля есть «пред-запись» до нажатия. Web Audio — только для индикатора уровня и расшифровки.
+let ctx = null, stream = null, src = null, analyser = null;
+let sr = 48000;
+let mr = null, mrMime = "";
+let recording = false, stopping = null;
+let level = 0;
+let fixedTake = null;            // запись тишины фиксированной длины
+
+async function listMics() {
+  try {
+    const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput");
+    const sel = $("mic");
+    const cur = sel.value;
+    sel.innerHTML = "";
+    devs.forEach((d, i) => {
+      const o = document.createElement("option");
+      o.value = d.deviceId;
+      o.textContent = d.label || "Микрофон " + (i + 1);
+      sel.appendChild(o);
+    });
+    if (cur) sel.value = cur;
+  } catch (e) {}
+}
+
+// AudioContext создаётся синхронно в обработчике нажатия (иначе Chrome может оставить его на паузе)
+function makeCtx() {
+  if (ctx) return;
+  ctx = new AudioContext();
+  sr = ctx.sampleRate;
+}
+
+function pickMime() {
+  for (const t of ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/webm", "audio/mp4"]) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return "";
+}
+
+// новый рекордер; предыдущий (если есть) возвращается вызывающему, чтобы остановить и забрать запись
+function startRecorder() {
+  const r = new MediaRecorder(stream, mrMime ? { mimeType: mrMime, audioBitsPerSecond: 256000 } : undefined);
+  r._chunks = [];
+  r._t0 = performance.now();
+  r.ondataavailable = (e) => { if (e.data && e.data.size) r._chunks.push(e.data); };
+  r.onstart = () => { r._t0 = performance.now(); };
+  r.start();
+  const old = mr;
+  mr = r;
+  return old;
+}
+
+function stopRecorder(r) {
+  return new Promise((res) => {
+    if (!r || r.state === "inactive") { res(r && r._chunks.length ? new Blob(r._chunks, { type: r.mimeType }) : null); return; }
+    r.onstop = () => res(new Blob(r._chunks, { type: r.mimeType }));
+    r.stop();
+  });
+}
+
+async function startAudio(deviceId) {
+  makeCtx();
+  if (mr) { const old = mr; mr = null; stopRecorder(old); }
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      deviceId: deviceId ? { exact: deviceId } : undefined,
+      channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+    },
+  });
+  mrMime = pickMime();
+  startRecorder();
+  // индикатор уровня
+  if (src) src.disconnect();
+  src = ctx.createMediaStreamSource(stream);
+  if (!analyser) {
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    const mute = ctx.createGain();
+    mute.gain.value = 0;
+    analyser.connect(mute).connect(ctx.destination);
+  }
+  src.connect(analyser);
+  if (ctx.state !== "running") { try { await ctx.resume(); } catch (e) {} }
+  await listMics();
+  const s = stream.getAudioTracks()[0].getSettings();
+  log("Микрофон: " + (stream.getAudioTracks()[0].label || "по умолчанию") + (s.sampleRate ? ", " + s.sampleRate + " Гц" : "") + ", запись " + (mrMime || "по умолчанию"));
+}
+
+// пока не пишем дубль — рекордер перезапускается раз в 20 с (не копит длинную запись); новый стартует до остановки старого
+setInterval(() => {
+  const st = $("micState");
+  if (!stream) { st.textContent = "Микрофон ещё не включён — нажми пробел или кнопку записи"; st.className = "take"; return; }
+  const tr = stream.getAudioTracks()[0];
+  if (!tr || tr.readyState === "ended") { st.textContent = "Микрофон отключился — выбери его снова в списке справа вверху"; st.className = "take bad"; return; }
+  if (!recording && !stopping && mr && performance.now() - mr._t0 > 20000) stopRecorder(startRecorder());
+  st.textContent = "Микрофон работает · запись напрямую с микрофона" + (ctx && ctx.state !== "running" ? " · индикатор на паузе (кликни по странице)" : "");
+  st.className = "take";
+}, 500);
+
+function meterLoop() {
+  if (analyser) {
+    const b = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(b);
+    let pk = 0;
+    for (let i = 0; i < b.length; i++) { const a = Math.abs(b[i]); if (a > pk) pk = a; }
+    level = Math.max(pk, level * 0.85);
+  }
+  const db = level > 1e-5 ? 20 * Math.log10(level) : -90;
+  const w = Math.max(0, Math.min(1, (db + 48) / 48));     // −48…0 дБ
+  const el = $("lvl");
+  el.style.width = (w * 100).toFixed(1) + "%";
+  el.className = level > 0.97 ? "clip" : level > 0.6 ? "hot" : "";
+  requestAnimationFrame(meterLoop);
+}
+requestAnimationFrame(meterLoop);
+
+async function ensureAudio() {
+  makeCtx();
+  const resumed = ctx.state !== "running" ? ctx.resume() : null;   // в том же обработчике нажатия
+  if (!stream) await startAudio($("mic").value || undefined);
+  if (resumed) { try { await Promise.race([resumed, new Promise((r) => setTimeout(r, 500))]); } catch (e) {} }
+}
+
+// --- запись ------------------------------------------------------------------------------------------------
+let pressAt = 0, held = false;
+
+async function begin() {
+  if (recording && !stopping) return;
+  held = true;
+  pressAt = performance.now();
+  if (!stream) {
+    // первое нажатие: включаем микрофон (браузер спросит разрешение) — запись начнётся со следующего нажатия
+    try { await ensureAudio(); log("Микрофон включён — теперь держи пробел для записи"); }
+    catch (e) { log("Нет доступа к микрофону: " + e.message, "bad"); }
+    return;
+  }
+  try { await ensureAudio(); } catch (e) { log("Звук: " + e.message, "bad"); return; }
+  if (!held && !cur().loop) return;   // успели отпустить, пока включался звук
+  if (stopping) { clearTimeout(stopping.t); stopping.go(); }
+  pressAt = performance.now();
+  recording = true;
+  loopRec = !!cur().loop;
+  $("rec").classList.add("live");
+  $("rec").textContent = loopRec ? "● Фон пишется…  нажми ещё раз, чтобы остановить" : "● Запись…  отпусти, чтобы сохранить";
+  if (loopRec) loopTick();
+}
+
+let loopRec = false;
+function loopTick() {
+  if (!recording || !loopRec || stopping) return;
+  const s = (performance.now() - pressAt) / 1000;
+  $("rec").textContent = "● Фон пишется… " + s.toFixed(0) + " с  (нужно 30–60) — нажми ещё раз, чтобы остановить";
+  setTimeout(loopTick, 250);
+}
+
+function end() {
+  held = false;
+  if (!recording || stopping || fixedTake) return;
+  if (loopRec && (performance.now() - pressAt) / 1000 < 20) log("Фон короче 20 с — для петли маловато, лучше 30–60 с", "meh");
+  loopRec = false;
+  const name = fileName(cur().id);
+  const relAt = performance.now();
+  const heldSec = (relAt - pressAt) / 1000;
+  if (heldSec < MIN_TAKE) {
+    recording = false;
+    resetBtn();
+    log("Слишком коротко (" + heldSec.toFixed(2) + " с) — держи дольше", "meh");
+    return;
+  }
+  const t0 = pressAt;
+  const go = () => { stopping = null; recording = false; resetBtn(); finish(name, t0, relAt + POST_ROLL * 1000); };
+  stopping = { go, t: setTimeout(go, POST_ROLL * 1000) };
+}
+
+function resetBtn() {
+  $("rec").classList.remove("live");
+  $("rec").innerHTML = cur().loop ? "Фон: нажми <kbd>Пробел</kbd> — запись, ещё раз — стоп" : "Удерживай <kbd>Пробел</kbd> или эту кнопку";
+}
+
+// дубль: остановить текущий рекордер (сразу запустив следующий), расшифровать, вырезать [нажатие − PRE_ROLL, отпускание + POST_ROLL]
+async function finish(name, t0, t1) {
+  const r = startRecorder();
+  const blob = await stopRecorder(r);
+  if (!blob || !blob.size) { log("Пустая запись — микрофон не дал звук. Не сохранено.", "bad"); return; }
+  let buf;
+  try { buf = await ctx.decodeAudioData(await blob.arrayBuffer()); }
+  catch (e) { log("Не удалось расшифровать запись: " + e.message, "bad"); return; }
+  sr = buf.sampleRate;
+  const all = buf.getChannelData(0);
+  const a = Math.max(0, Math.round(((t0 - r._t0) / 1000 - PRE_ROLL) * sr));
+  const b = Math.min(all.length, Math.round(((t1 - r._t0) / 1000) * sr));
+  if (b - a < sr * MIN_TAKE) { log("Запись оказалась пустой (" + ((b - a) / sr).toFixed(2) + " с). Не сохранено.", "bad"); return; }
+  save(name, all.slice(a, b));
+}
+
+function wav24(s) {
+  const n = s.length;
+  const buf = new ArrayBuffer(44 + n * 3);
+  const v = new DataView(buf);
+  const str = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + n * 3, true); str(8, "WAVE");
+  str(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 3, true); v.setUint16(32, 3, true); v.setUint16(34, 24, true);
+  str(36, "data"); v.setUint32(40, n * 3, true);
+  let o = 44;
+  for (let i = 0; i < n; i++) {
+    const x = Math.round(Math.max(-1, Math.min(1, s[i])) * 8388607);
+    v.setUint8(o, x & 255); v.setUint8(o + 1, (x >> 8) & 255); v.setUint8(o + 2, (x >> 16) & 255);
+    o += 3;
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+async function save(name, samples) {
+  const blob = wav24(samples);
+  try {
+    if (dir) {
+      const fh = await dir.getFileHandle(name, { create: true });
+      const w = await fh.createWritable();
+      await w.write(blob);
+      await w.close();
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
+  } catch (e) { log("Не сохранилось " + name + ": " + e.message, "bad"); return; }
+  saved.push({ name, samples });
+  const m = name.startsWith("roomtone") ? null : FILE_RE.exec(name);
+  if (m) {
+    counts[m[1]] = (counts[m[1]] || 0) + 1;
+    nextNum[m[1]] = Math.max(nextNum[m[1]] || 1, parseInt(m[2], 10) + 1);
+  }
+  showTake(name, samples);
+  log("Сохранено " + name + (dir ? "" : " (в Загрузки)"));
+  // набрали нужное — к следующему звуку
+  const it = cur();
+  if (m && $("advance").checked && (counts[it.id] || 0) === it.n && catIdx < cats().length - 1) catIdx++;
+  render();
+  if ($("autoplay").checked) play();
+}
+
+function showTake(name, s) {
+  let pk = 0;
+  for (let i = 0; i < s.length; i++) pk = Math.max(pk, Math.abs(s[i]));
+  const db = pk > 1e-5 ? 20 * Math.log10(pk) : -90;
+  let note = "";
+  if (pk > 0.98) note = ' <span class="bad">перегруз — перезапиши (Del)</span>';
+  else if (db < -24) note = ' <span class="meh">тихо — ближе к микрофону</span>';
+  $("takeInfo").innerHTML = `Последний: <b>${name}</b> · ${(s.length / sr).toFixed(2)} с · пик ${db.toFixed(1)} дБ${note}`;
+  $("play").disabled = false;
+  $("del").disabled = false;
+  const c = $("wave"), g = c.getContext("2d");
+  const W = c.width, H = c.height, cs = getComputedStyle(document.body);
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = cs.getPropertyValue("--accent");
+  const step = Math.max(1, Math.floor(s.length / W));
+  for (let x = 0; x < W; x++) {
+    let mn = 0, mx = 0;
+    for (let i = x * step; i < Math.min(s.length, (x + 1) * step); i++) { mn = Math.min(mn, s[i]); mx = Math.max(mx, s[i]); }
+    g.fillRect(x, H / 2 - mx * H / 2, 1, Math.max(1, (mx - mn) * H / 2));
+  }
+  g.fillStyle = cs.getPropertyValue("--rec");
+  g.fillRect(0, 0, W, 2); g.fillRect(0, H - 2, W, 2);
+}
+
+let playing = null;
+function play() {
+  const last = saved[saved.length - 1];
+  if (!last || !ctx) return;
+  if (playing) { try { playing.stop(); } catch (e) {} }
+  const b = ctx.createBuffer(1, last.samples.length, sr);
+  b.copyToChannel(last.samples, 0);
+  playing = ctx.createBufferSource();
+  playing.buffer = b;
+  playing.connect(ctx.destination);
+  playing.start();
+}
+
+async function delLast() {
+  const last = saved.pop();
+  if (!last) return;
+  try { if (dir) await dir.removeEntry(last.name); } catch (e) { log("Не удалось удалить " + last.name + ": " + e.message, "bad"); saved.push(last); return; }
+  const m = last.name.startsWith("roomtone") ? null : FILE_RE.exec(last.name);
+  if (m) {
+    counts[m[1]] = Math.max(0, (counts[m[1]] || 1) - 1);
+    if (nextNum[m[1]] === parseInt(m[2], 10) + 1) nextNum[m[1]] = parseInt(m[2], 10);
+  }
+  log("Удалено " + last.name + (dir ? "" : " (из Загрузок удали сам)"), "meh");
+  const prev = saved[saved.length - 1];
+  if (prev) showTake(prev.name, prev.samples);
+  else { $("takeInfo").textContent = "Последний дубль: —"; $("play").disabled = true; $("del").disabled = true; $("wave").getContext("2d").clearRect(0, 0, 1200, 180); }
+  render();
+}
+
+$("room").onclick = async () => {
+  try { await ensureAudio(); } catch (e) { log("Нет доступа к микрофону: " + e.message, "bad"); return; }
+  if (recording) return;
+  log("Тишина 5 с — не шуми…");
+  const name = "roomtone_" + Date.now().toString().slice(-6) + ".wav";
+  const t0 = performance.now() + PRE_ROLL * 1000;     // без пред-записи (там мог быть щелчок мыши)
+  fixedTake = true;
+  recording = true;
+  $("rec").classList.add("live");
+  $("rec").textContent = "● Тишина комнаты… 5 с";
+  setTimeout(() => {
+    fixedTake = null;
+    recording = false;
+    resetBtn();
+    finish(name, t0, performance.now());
+  }, 5000 + PRE_ROLL * 1000);
+};
+
+// --- управление ---------------------------------------------------------------------------------------------
+const recBtn = $("rec");
+// обычный звук — удерживать; фон (loop) — нажал: пишет, нажал ещё раз: стоп
+function press() {
+  if (recording && loopRec) { end(); return; }
+  begin();
+}
+function release() {
+  if (loopRec || (cur().loop && !recording)) { held = false; return; }
+  end();
+}
+recBtn.addEventListener("pointerdown", (e) => { recBtn.setPointerCapture(e.pointerId); press(); });
+recBtn.addEventListener("pointerup", release);
+recBtn.addEventListener("pointercancel", release);
+$("play").onclick = play;
+$("del").onclick = delLast;
+$("mic").onchange = () => startAudio($("mic").value).catch((e) => log(e.message, "bad"));
+
+let spaceDown = false;
+window.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "SELECT") return;
+  if (e.code === "Space") { e.preventDefault(); if (!spaceDown) { spaceDown = true; press(); } return; }
+  if (e.repeat || recording) return;
+  if (e.code === "ArrowDown") { e.preventDefault(); catIdx = Math.min(cats().length - 1, catIdx + 1); render(); }
+  else if (e.code === "ArrowUp") { e.preventDefault(); catIdx = Math.max(0, catIdx - 1); render(); }
+  else if (/^[1-9]$/.test(e.key) && +e.key <= GROUPS.length) { group = +e.key - 1; catIdx = 0; render(); }
+  else if (e.code === "KeyP") play();
+  else if (e.code === "Delete") { e.preventDefault(); delLast(); }
+});
+window.addEventListener("keyup", (e) => { if (e.code === "Space") { e.preventDefault(); spaceDown = false; release(); } });
+window.addEventListener("blur", () => { if (spaceDown) { spaceDown = false; release(); } });
+
+for (const t of TIPS) { const li = document.createElement("li"); li.textContent = t; $("tips").appendChild(li); }
+render();
+navigator.mediaDevices && navigator.mediaDevices.enumerateDevices && listMics();
+</script>
+</body>
+</html>
