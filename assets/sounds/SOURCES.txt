@@ -1,0 +1,10 @@
+Записи звуков — CC0 (общественное достояние):
+- Kenney «Impact Sounds», «RPG Audio» — https://kenney.nl/assets/impact-sounds , https://kenney.nl/assets/rpg-audio
+- artisticdude «Zombies Sound Pack» — https://opengameart.org/content/zombies-sound-pack
+- ianzazz «Zombie noises and moans» — https://opengameart.org/content/zombie-noises-and-moans
+- Ted Kerr (Wolfgang_) «Crickets ambient noise» — https://opengameart.org/content/crickets-ambient-noise-loopable
+- Écrivain «Icy Heights» (wind.ogg) — https://opengameart.org/content/icy-heights
+- isaiah658 «Ambient Bird Sounds» — https://opengameart.org/content/ambient-bird-sounds
+- IgnasD «Crows Singing» — https://opengameart.org/content/crows-singing
+Синтезированные (tools/gen_sounds.gd): взмах, еда, питьё, хрип игрока; запасные варианты остальных.
+Свои записи (tools/sound_recorder.html, scripts/ai3d/sfx_proc.py): block_break, drink, eat, hit_flesh, hit_metal, hit_stone, hit_wood, loot_open, player_hurt
