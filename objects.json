@@ -1,9 +1,0 @@
-[
-  {
-    "name": "street_lamp",
-    "prompt": "old street lamp post, rusty metal, full length, entire object visible from base to top, single object, centered, plain white background, 3/4 view, soft studio lighting, game asset",
-    "kind": "prop_large",
-    "cells": [1, 4, 1],
-    "seed": 1234
-  }
-]
