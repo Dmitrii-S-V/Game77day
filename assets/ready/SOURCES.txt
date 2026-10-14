@@ -1,0 +1,28 @@
+Сторонние 3D-модели (лицензии требуют указать автора — перенести в титры игры)
+
+pistol_9mm.glb
+  "pistol 9mm" by DJMaesen (https://sketchfab.com/bumstrum)
+  https://sketchfab.com/3d-models/pistol-9mm-4477cfe3f4b342f4b5ebd3090b6b902f
+  Лицензия: CC BY 4.0 (http://creativecommons.org/licenses/by/4.0/)
+  Изменения: оставлен один экземпляр, поза скелета запечена в геометрию, масштаб и оси под игру,
+  текстуры пережаты в JPEG (scripts/ai3d/pistol_prep.py). Исходник: assets/src/pistol/pistol_9mm_src.glb
+
+props/sofa_old.glb
+  "Old Sofa" by glezova (https://sketchfab.com/glezova)
+  https://sketchfab.com/3d-models/old-sofa-3fe7ed15c42e48b8820792e8cef64f93
+  Лицензия: CC BY 4.0 (http://creativecommons.org/licenses/by/4.0/)
+  Изменения: меши слиты, масштаб под 2x1 блока, текстуры в JPEG (scripts/ai3d/prop_prep.py). Исходник: assets/src/props/old_sofa.glb
+
+props/bench_wooden.glb
+  "Bench Wooden 01" by randombug (https://sketchfab.com/randombug)
+  https://sketchfab.com/3d-models/bench-wooden-01-1400c9340d5049589deb43601462ac55
+  Лицензия: CC BY 4.0 (http://creativecommons.org/licenses/by/4.0/)
+  Изменения: оси и масштаб под игру, текстуры 1024 JPEG (scripts/ai3d/prop_prep.py); перекраска оттенков в игре.
+  Исходник: assets/src/props/bench_wooden_01.glb
+
+props/fence_concrete.glb
+  "Fence Concrete- 15MB" by Mehdi Shahsavan (https://sketchfab.com/ahmagh2e)
+  https://sketchfab.com/3d-models/fence-concrete-15mb-5d0f6d3b4e61496c8882e3151f18bdfb
+  Лицензия: CC BY 4.0 (http://creativecommons.org/licenses/by/4.0/)
+  Изменения: меши слиты, масштаб под ширину 2 блока, текстуры в JPEG (scripts/ai3d/prop_prep.py).
+  Исходник: assets/src/props/fence_concrete-_15mb.glb
