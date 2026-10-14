@@ -1,0 +1,15 @@
+# Godot
+.godot/
+*.translation
+export.cfg
+.mono/
+
+# Сборки и временное
+build/
+_dl/
+shots/
+texbake/
+
+# Системное
+.DS_Store
+Thumbs.db
