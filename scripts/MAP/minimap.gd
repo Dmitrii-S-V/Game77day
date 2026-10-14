@@ -37,6 +37,15 @@ var _next_n := 1
 var _hover_m := Vector2.ZERO
 var _prev_mouse := Input.MOUSE_MODE_CAPTURED   # режим мыши до открытия большой карты
 var _hi_state := 0                              # чёткое превью: 0 не строилось, 1 строится, 2 готово
+var _redraw_t := 0.0
+var _touches := {}                              # палец -> позиция (щипок двумя пальцами и долгое нажатие)
+var _pinch_d := 0.0
+var _lp_idx := -1                               # палец долгого нажатия (-1 нет)
+var _lp_pos := Vector2.ZERO
+var _lp_t := 0.0
+
+const LONG_PRESS := 0.55                        # секунд удержания на месте = метка (ПКМ на телефоне)
+const LONG_PRESS_SLOP := 14.0
 var _road_cols := {}
 var _road_w := {}
 var _river_boxes: Array[Rect2] = []             # габариты рек/дорог: быстро отсекать невидимые
@@ -52,6 +61,9 @@ const POI_COL := Color(0.75, 0.2, 0.9)
 
 func _ready() -> void:
 	add_to_group("minimap")
+	if OS.has_feature("mobile"):
+		preview_px = 768     # на телефоне превью строится на слабых ядрах: меньше и без «чёткого» 2048
+		_hi_state = 2
 	custom_minimum_size = map_size
 	size = map_size
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -139,6 +151,8 @@ func _set_expanded(on: bool) -> void:
 	expanded = on
 	is_open = on
 	_drag = false
+	_touches.clear()
+	_lp_idx = -1
 	mouse_filter = Control.MOUSE_FILTER_STOP if on else Control.MOUSE_FILTER_IGNORE
 	if on:
 		_center_m = Vector2(pl.global_position.x, pl.global_position.z) if pl != null else Vector2.ONE * world_size * 0.5
@@ -157,12 +171,19 @@ func _input(event: InputEvent) -> void:
 	if not expanded:
 		return
 	var inv_xf := get_global_transform().affine_inverse()
+	# сенсорный экран: щипок двумя пальцами — масштаб, долгое нажатие — метка (перетаскивание — эмуляция мыши)
+	if event is InputEventScreenTouch:
+		_touch_event(event as InputEventScreenTouch, inv_xf)
+		return
+	if event is InputEventScreenDrag:
+		_screen_drag_event(event as InputEventScreenDrag, inv_xf)
+		return
 	if event is InputEventMouseMotion:
 		var mm := event as InputEventMouseMotion
 		var lp := inv_xf * mm.position
 		if Rect2(Vector2.ZERO, size).has_point(lp):
 			_hover_m = _local_to_world(lp)
-		if _drag:
+		if _drag and _touches.size() < 2:
 			_center_m -= mm.relative / _scale()
 			_follow = false
 			_clamp_center()
@@ -184,6 +205,80 @@ func _input(event: InputEvent) -> void:
 				_zoom(0.8 if mb.button_index == MOUSE_BUTTON_WHEEL_UP else 1.25, lp)
 		if inside:
 			get_viewport().set_input_as_handled()
+
+
+func _touch_event(t: InputEventScreenTouch, inv_xf: Transform2D) -> void:
+	if t.pressed:
+		if not Rect2(Vector2.ZERO, size).has_point(inv_xf * t.position):
+			return
+		_touches[t.index] = t.position
+		if _touches.size() == 1:
+			_lp_idx = t.index
+			_lp_pos = t.position
+			_lp_t = 0.0
+		else:
+			_lp_idx = -1
+			_drag = false
+			_pinch_d = _pinch_dist()
+	else:
+		_touches.erase(t.index)
+		if t.index == _lp_idx:
+			_lp_idx = -1
+		if _touches.size() < 2:
+			_pinch_d = 0.0
+
+
+func _screen_drag_event(d: InputEventScreenDrag, inv_xf: Transform2D) -> void:
+	if _touches.has(d.index):
+		_touches[d.index] = d.position
+	if d.index == _lp_idx and d.position.distance_to(_lp_pos) > LONG_PRESS_SLOP:
+		_lp_idx = -1
+	if _touches.size() >= 2:
+		var nd := _pinch_dist()
+		if _pinch_d > 1.0 and nd > 1.0:
+			_zoom(_pinch_d / nd, inv_xf * _pinch_mid())   # пальцы разошлись — ближе
+		_pinch_d = nd
+		get_viewport().set_input_as_handled()
+
+
+func _pinch_dist() -> float:
+	var p: Array = _touches.values()
+	return (p[0] as Vector2).distance_to(p[1]) if p.size() >= 2 else 0.0
+
+
+func _pinch_mid() -> Vector2:
+	var p: Array = _touches.values()
+	return ((p[0] as Vector2) + (p[1] as Vector2)) * 0.5 if p.size() >= 2 else Vector2.ZERO
+
+
+## Долгое нажатие на месте = ПКМ (поставить/убрать метку).
+func _long_press_tick(delta: float) -> void:
+	if _lp_idx < 0 or not expanded:
+		return
+	_lp_t += delta
+	if _lp_t >= LONG_PRESS:
+		_lp_idx = -1
+		_drag = false
+		_toggle_mark(get_global_transform().affine_inverse() * _lp_pos)
+
+
+# --- управление с экранных кнопок (TouchControls) -----------------------------------------------------------------
+
+func toggle() -> void:
+	_set_expanded(not expanded)
+
+
+func zoom_step(factor: float) -> void:
+	if expanded:
+		_zoom(factor, size * 0.5)
+
+
+func follow_player() -> void:
+	_follow = true
+
+
+func next_color() -> void:
+	_color_i = (_color_i + 1) % PALETTE.size()
 
 
 ## Отладка (снимки): открыть большую карту без проверки мыши.
@@ -287,7 +382,7 @@ func _get_player() -> Node3D:
 	return get_tree().get_first_node_in_group("player") as Node3D
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	for node in markers.keys():
 		if not is_instance_valid(node):
 			markers.erase(node)
@@ -295,7 +390,12 @@ func _process(_delta: float) -> void:
 		var p := _get_player()
 		if p != null:
 			_center_m = Vector2(p.global_position.x, p.global_position.z)
-	queue_redraw()
+	_long_press_tick(delta)
+	# маленькая карта — 10 раз в секунду (экономия CPU/GPU на телефоне), большая — каждый кадр (перетаскивание)
+	_redraw_t -= delta
+	if expanded or _redraw_t <= 0.0:
+		_redraw_t = 0.1
+		queue_redraw()
 
 
 # --- рисование ---------------------------------------------------------------------------------------------------

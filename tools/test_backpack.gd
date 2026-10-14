@@ -39,6 +39,23 @@ func _init() -> void:
 	inv2.slots[20] = {"id": "stone", "n": 1}
 	check("с вещью в доп. ячейке снять нельзя", inv2.has_extra_items())
 
+	# двойное нажатие (телефон): рюкзак в руке уходит на спину
+	var inv3 := Inventory.new()
+	ui.inv = inv3
+	ui._eq["back"] = null
+	ui._cursor = {"id": "backpack", "n": 1}
+	var dbl := InputEventMouseButton.new()
+	dbl.button_index = MOUSE_BUTTON_LEFT
+	dbl.pressed = true
+	dbl.double_click = true
+	ui._slot_input(dbl, 10)
+	check("двойное нажатие надевает рюкзак из руки", inv3.has_backpack and ui._cursor == null and ui._eq["back"] != null)
+	ui._cursor = {"id": "stone", "n": 1}
+	ui._eq["back"] = null
+	inv3.has_backpack = false
+	ui._slot_input(dbl, 10)
+	check("двойное нажатие с камнем рюкзак не надевает", not inv3.has_backpack)
+
 	# аватар: рюкзак виден только когда надет
 	var av := PlayerAvatar.new()
 	root.add_child(av)

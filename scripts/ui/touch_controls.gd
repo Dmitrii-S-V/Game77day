@@ -74,6 +74,11 @@ func take_look() -> Vector2:
 ## [id, подпись, центр (от правого/левого края), радиус]; x < 0 — от правого края, y < 0 — от нижнего.
 func _buttons() -> Array:
 	var open := _ui_open()
+	if open and Minimap.is_open:
+		# большая карта: перетаскивание — пальцем, щипок — масштаб, долгое нажатие — метка; кнопки для того же без жестов
+		return [["close", "Закрыть", Vector2(-90, 70), 52.0],
+			["mzin", "+", Vector2(-90, 200), 46.0], ["mzout", "−", Vector2(-90, 310), 46.0],
+			["mhome", "Я", Vector2(-90, 420), 46.0], ["mcol", "Цвет", Vector2(-90, 530), 46.0]]
 	if open:
 		return [["close", "Закрыть", Vector2(-90, 70), 52.0]]
 	if _menu.visible:
@@ -89,6 +94,7 @@ func _buttons() -> Array:
 		["inv", "Инв.", Vector2(-90, 70), 46.0],
 		["menu", "Меню", Vector2(-200, 70), 46.0],
 		["drop", "Выбр.", Vector2(-310, 70), 40.0],
+		["map", "Карта", Vector2(-420, 70), 46.0],
 	]
 
 
@@ -219,16 +225,34 @@ func _press(b: String, down: bool) -> void:
 			player._drop_selected()
 		"inv", "close":
 			_release_all()
-			player.ui.toggle(0)
+			if b == "close" and Minimap.is_open:
+				_minimap().toggle()      # «Закрыть» при открытой карте закрывает карту, а не открывает инвентарь
+			else:
+				player.ui.toggle(0)
+		"map":
+			_release_all()
+			_minimap().toggle()
+		"mzin":
+			_minimap().zoom_step(0.7)
+		"mzout":
+			_minimap().zoom_step(1.0 / 0.7)
+		"mhome":
+			_minimap().follow_player()
+		"mcol":
+			_minimap().next_color()
 		"menu":
 			_release_all()
 			_menu.visible = true
 
 
+func _minimap() -> Minimap:
+	return get_tree().get_first_node_in_group("minimap") as Minimap
+
+
 ## Открылось окно — отпустить всё (иначе бег/удар «залипнут»).
 func _release_all() -> void:
 	for idx in _fingers.keys():
-		if String(_fingers[idx]["role"]) != "btn" or not String(_fingers[idx]["btn"]) in ["inv", "close", "menu"]:
+		if String(_fingers[idx]["role"]) != "btn" or not String(_fingers[idx]["btn"]) in ["inv", "close", "menu", "map"]:
 			_fingers.erase(idx)
 	move = Vector2.ZERO
 	_joy_on = false

@@ -363,6 +363,10 @@ func _ready() -> void:
 		tcl.main = self
 		add_child(tcl)
 		tcl.fire_pressed.connect(player._on_touch_fire)
+	if DynamicRes.wanted():
+		var dr := DynamicRes.new()
+		dr.name = "DynamicRes"
+		add_child(dr)
 	if not save_d.is_empty() and not _net_client:
 		SaveGame.apply_player(player, save_d)
 	# звуковой фон и зомби (в отладочных снимках/замерах зомби только с --zombies=1)

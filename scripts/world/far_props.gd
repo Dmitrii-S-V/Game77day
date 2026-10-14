@@ -27,6 +27,11 @@ const FULL_FROM := NEAR_END - FADE   # оригинальная модель н�
 const FULL_TO := 210.0
 const MID_TO := 420.0
 
+## Качество дальних деревьев (настройки графики): радиус и число уровней LOD.
+## tiers: 0 — только простые модели (телефон), 1 — облегчённые + простые, 2 — оригинальные + облегчённые + простые.
+var _range := RANGE
+var _tiers := 2
+
 var gen: WorldGen
 var veg: Vegetation                 # источник материалов ствола и листвы
 var _tier_mats := {}                # "full"|"mid" -> {"bark": mat, "leaf": mat, "pine": mat, "dry": mat}
@@ -94,15 +99,36 @@ func refresh_at(pos: Vector3) -> void:
 		_pending.push_front(key)
 
 
+## Настройки графики: радиус дальних деревьев (м) и число уровней LOD. Все плитки перестраиваются.
+func set_quality(range_m: float, tiers: int) -> void:
+	range_m = clampf(range_m, 200.0, RANGE)
+	tiers = clampi(tiers, 0, 2)
+	if is_equal_approx(range_m, _range) and tiers == _tiers:
+		return
+	_range = range_m
+	_tiers = tiers
+	_tier_mats.clear()
+	_mesh_cache.clear()
+	if _mat_tree != null:
+		_mat_tree.set_shader_parameter("cut", (near_end - FADE) if tiers == 0 else (MID_TO - FADE))
+	for k: Vector2i in _tiles.keys():
+		_tiles[k].queue_free()
+	_tiles.clear()
+	_pending.clear()
+	_refresh.clear()
+	_center = Vector2(1e9, 0)
+	_timer = 0.0
+
+
 func _rebuild(p: Vector2) -> void:
 	_pending.clear()
-	var t0 := Vector2i(floori((p.x - RANGE) / TILE), floori((p.y - RANGE) / TILE))
-	var t1 := Vector2i(floori((p.x + RANGE) / TILE), floori((p.y + RANGE) / TILE))
+	var t0 := Vector2i(floori((p.x - _range) / TILE), floori((p.y - _range) / TILE))
+	var t1 := Vector2i(floori((p.x + _range) / TILE), floori((p.y + _range) / TILE))
 	var wanted := {}
 	for tz in range(t0.y, t1.y + 1):
 		for tx in range(t0.x, t1.x + 1):
 			var c := Vector2((tx + 0.5) * TILE, (tz + 0.5) * TILE)
-			if c.distance_to(p) > RANGE + TILE * 0.7 or c.distance_to(p) < CUT_PROP - TILE * 0.7:
+			if c.distance_to(p) > _range + TILE * 0.7 or c.distance_to(p) < CUT_PROP - TILE * 0.7:
 				continue
 			if not gen.in_map(tx * COLS, tz * COLS) and not gen.in_map(tx * COLS + COLS - 1, tz * COLS + COLS - 1):
 				continue
@@ -179,7 +205,7 @@ func _build(key: Vector2i, removed: Dictionary = {}) -> Dictionary:
 					tint.r, tint.g, tint.b, tint.a]))
 				bufs[kind] = arr
 				counts[kind] = int(counts[kind]) + 1
-				if kind != "rock":
+				if kind != "rock" and _tiers > 0:     # при tiers=0 оригинальные/облегчённые деревья не нужны
 					var mn := String(p["mesh"])
 					var fa: PackedFloat32Array = fulls.get(mn, PackedFloat32Array())
 					fa.append_array(PackedFloat32Array([b.x.x, b.y.x, b.z.x, x, b.x.y, b.y.y, b.z.y, y, b.x.z, b.y.z, b.z.z, z]))
@@ -308,7 +334,8 @@ func _apply() -> void:
 			_tiles[key].queue_free()
 			_tiles.erase(key)
 		var node := Node3D.new()
-		_add_tree_tiers(node, r["fulls"])
+		if _tiers > 0:
+			_add_tree_tiers(node, r["fulls"])
 		for k: String in ["pine", "oak", "rock"]:
 			var n: int = r["counts"][k]
 			if n == 0:
@@ -323,8 +350,9 @@ func _apply() -> void:
 			mmi.multimesh = mm
 			mmi.material_override = _mat_tree
 			mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			mmi.visibility_range_end = ROCK_RANGE + TILE if k == "rock" else RANGE + TILE
-			mmi.visibility_range_begin = 0.0 if k == "rock" else MID_TO - TILE
+			mmi.visibility_range_end = ROCK_RANGE + TILE if k == "rock" else _range + TILE
+			# простая модель: при tiers=0 — сразу после обычных деревьев, иначе — за пределами облегчённой
+			mmi.visibility_range_begin = 0.0 if (k == "rock" or _tiers == 0) else MID_TO - TILE
 			node.add_child(mmi)
 		for kk: String in ["poles", "bld"]:
 			var mb: MeshBuilder = r[kk]
@@ -334,7 +362,7 @@ func _apply() -> void:
 			mi.mesh = mb.to_mesh()
 			mi.material_override = _mat_prop
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if kk == "bld" else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			mi.visibility_range_end = (POLE_RANGE + TILE) if kk == "poles" else RANGE + TILE
+			mi.visibility_range_end = (POLE_RANGE + TILE) if kk == "poles" else _range + TILE
 			node.add_child(mi)
 		add_child(node)
 		_tiles[key] = node
@@ -350,7 +378,7 @@ func _add_tree_tiers(node: Node3D, fulls: Dictionary) -> void:
 		var n := buf.size() / 12
 		if n == 0:
 			continue
-		for tier in ["full", "mid"]:
+		for tier in (["full", "mid"] if _tiers >= 2 else ["mid"]):
 			var mesh := _tier_mesh(mn, tier)
 			if mesh == null:
 				continue
@@ -363,7 +391,7 @@ func _add_tree_tiers(node: Node3D, fulls: Dictionary) -> void:
 			mmi.multimesh = mm
 			# дальние деревья тоже отбрасывают тень (её дальность — настройки графики; дальше тени не считаются)
 			mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-			mmi.visibility_range_begin = 0.0 if tier == "full" else FULL_TO - 50.0
+			mmi.visibility_range_begin = 0.0 if (tier == "full" or _tiers < 2) else FULL_TO - 50.0
 			mmi.visibility_range_end = (FULL_TO if tier == "full" else MID_TO) + TILE * 0.8
 			node.add_child(mmi)
 
@@ -374,16 +402,19 @@ var near_end := NEAR_END   # где кончаются обычные дерев
 ## Граница эстафеты «обычное дерево -> оригинальная модель FULL» (при уменьшенном радиусе растительности).
 func set_near_end(e: float) -> void:
 	near_end = e
-	if _tier_mats.has("full"):
-		for m: ShaderMaterial in (_tier_mats["full"] as Dictionary).values():
-			m.set_shader_parameter("far_cut", e - FADE)
+	if _tiers == 0 and _mat_tree != null:
+		_mat_tree.set_shader_parameter("cut", e - FADE)
+	for tier: String in ["full", "mid"]:
+		if _tier_mats.has(tier) and (tier == "full" or _tiers < 2):
+			for m: ShaderMaterial in (_tier_mats[tier] as Dictionary).values():
+				m.set_shader_parameter("far_cut", e - FADE)
 
 
 func _ensure_tier_mats() -> void:
 	if not _tier_mats.is_empty():
 		return
 	for tier in ["full", "mid"]:
-		var cut := near_end - FADE if tier == "full" else FULL_TO - FADE
+		var cut := near_end - FADE if (tier == "full" or _tiers < 2) else FULL_TO - FADE
 		var fend := FULL_TO if tier == "full" else MID_TO
 		var d := {}
 		for bn: String in veg._bark_mats:

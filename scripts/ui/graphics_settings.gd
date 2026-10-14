@@ -15,10 +15,10 @@ const ULTRA := 3
 # grass — радиус травы (колонки 16 м, 0 — нет); detail — до какой дистанции рельеф карт нормалей (м);
 # roads — плавные стыки покрытий; far — дальность камеры (м); post — свечение и плёночный постэффект
 const PRESETS := [
-	{"scale": 0.67, "shadow": 0.0, "splits": 2, "ssao": 0, "aa": 0, "terrain": 4, "grass": 0, "detail": 0.0, "roads": false, "far": 1800.0, "post": false},
-	{"scale": 0.8, "shadow": 100.0, "splits": 2, "ssao": 0, "aa": 1, "terrain": 5, "grass": 2, "detail": 30.0, "roads": true, "far": 2600.0, "post": true},
-	{"scale": 1.0, "shadow": 170.0, "splits": 4, "ssao": 1, "aa": 1, "terrain": 6, "grass": 3, "detail": 85.0, "roads": true, "far": 4000.0, "post": true},
-	{"scale": 1.0, "shadow": 240.0, "splits": 4, "ssao": 2, "aa": 2, "terrain": 7, "grass": 4, "detail": 120.0, "roads": true, "far": 5000.0, "post": true},
+	{"scale": 0.67, "shadow": 0.0, "splits": 2, "ssao": 0, "aa": 0, "terrain": 4, "grass": 0, "detail": 0.0, "roads": false, "far": 1800.0, "post": false, "ftrees": 460.0, "tiers": 0},
+	{"scale": 0.8, "shadow": 100.0, "splits": 2, "ssao": 0, "aa": 1, "terrain": 5, "grass": 2, "detail": 30.0, "roads": true, "far": 2600.0, "post": true, "ftrees": 600.0, "tiers": 1},
+	{"scale": 1.0, "shadow": 170.0, "splits": 4, "ssao": 1, "aa": 1, "terrain": 6, "grass": 3, "detail": 85.0, "roads": true, "far": 4000.0, "post": true, "ftrees": 780.0, "tiers": 2},
+	{"scale": 1.0, "shadow": 240.0, "splits": 4, "ssao": 2, "aa": 2, "terrain": 7, "grass": 4, "detail": 120.0, "roads": true, "far": 5000.0, "post": true, "ftrees": 780.0, "tiers": 2},
 ]
 
 static var level := MED
@@ -130,6 +130,7 @@ static func apply_world(m: Node) -> void:
 	# радиуса ближнее дерево ещё не создано, а дальняя модель уже растворилась — дерево «пропадало» при подходе
 	var ne := (vr - 1.5) * 16.0
 	m.veg.set_range(vr, ne)
+	m.far_props.set_quality(float(p["ftrees"]), int(p["tiers"]))
 	m.far_props.set_near_end(ne)
 	m.settlement.set_radius(mini(5, tr))
 	m.far.set_level0_sink(minf(86.0, int(p["terrain"]) * 16.0 - 10.0))
@@ -211,6 +212,7 @@ static func make_details(on_change: Callable) -> VBoxContainer:
 			["terrain", "Дальность ландшафта (×16 м)", 3.0, 8.0, 1.0, "%d"],
 			["grass", "Дальность травы (×16 м)", 0.0, 5.0, 1.0, "%d"],
 			["far", "Дальность прорисовки, м", 1000.0, 5000.0, 100.0, "%d"],
+			["ftrees", "Дальность дальних деревьев, м", 200.0, 780.0, 20.0, "%d"],
 			["detail", "Рельеф текстур до, м", 0.0, 150.0, 5.0, "%d"]]:
 		var key: String = s[0]
 		var row := HBoxContainer.new()
@@ -248,7 +250,8 @@ static func make_details(on_change: Callable) -> VBoxContainer:
 	for o: Array in [
 			["ssao", "Затенение (SSAO)", ["Нет", "Обычное", "Высокое"]],
 			["aa", "Сглаживание", ["Нет", "FXAA", "SMAA"]],
-			["splits", "Каскады теней", ["2 (быстрее)", "4 (чётче вблизи)"]]]:
+			["splits", "Каскады теней", ["2 (быстрее)", "4 (чётче вблизи)"]],
+			["tiers", "Дальние деревья", ["Простые (быстрее)", "Облегчённые", "Полные"]]]:
 		var key2: String = o[0]
 		var row2 := HBoxContainer.new()
 		box.add_child(row2)

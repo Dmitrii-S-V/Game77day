@@ -165,6 +165,17 @@ func _capacity() -> int:
 	return inv.capacity()
 
 
+## Рюкзак в руке — надеть на спину (если спина свободна).
+func _wear_cursor() -> bool:
+	if _cursor == null or String(ItemDB.info(String(_cursor["id"])).get("wear", "")) != "back" or _eq["back"] != null:
+		return false
+	_eq["back"] = _cursor
+	_cursor = null
+	_backpack = true
+	inv.changed.emit()
+	return true
+
+
 ## Загрузка сохранения: рюкзак уже был надет — показать его в слоте «Спина» и открыть ячейки.
 func wear_backpack_silently() -> void:
 	_eq["back"] = {"id": "backpack", "n": 1}
@@ -1147,6 +1158,9 @@ func _slot_input(event: InputEvent, i: int) -> void:
 		_split(i)
 		return
 	if mb.button_index == MOUSE_BUTTON_LEFT and mb.ctrl_pressed and _cursor == null and _wear_from_slot(i):
+		return
+	# двойное нажатие (и на телефоне, где нет Ctrl): первое взяло предмет в руку, второе — надеть рюкзак
+	if mb.button_index == MOUSE_BUTTON_LEFT and mb.double_click and _wear_cursor():
 		return
 	if mb.button_index == MOUSE_BUTTON_LEFT and mb.shift_pressed and _cursor == null:
 		_quick_move(i)
