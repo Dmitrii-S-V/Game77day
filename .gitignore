@@ -1,0 +1,35 @@
+# Godot 4
+.godot/
+.mono/
+*.translation
+export_credentials.cfg
+
+# Build / downloads
+build/
+_dl/
+
+# Temporary
+*.tmp
+*.log
+*.bak
+Thumbs.db
+desktop.ini
+
+# Helper scripts
+fix_git.bat
+fix_git.ps1
+
+push_git.bat
+push_git.ps1
+commit_push.bat
+commit_push.ps1
+sync_repo.bat
+sync_repo.ps1
+fix_git*
+git_run.log
+
+# Installers / archives
+*.exe
+*.zip
+*.xz
+*.blend1
