@@ -1,0 +1,34 @@
+{
+    "description": "The default project.", 
+    "author": "Default Author <default@example.com>", 
+    "bt:publisher": "Example Publisher", 
+    "bt:libs": [],
+    "site": "http://apps.bittorrent.com", 
+    "bt:update_url": "http://apps.bittorrent.com/utorrent-onboarding/plus.btapp", 
+    "version": "0.1", 
+    "bt:description": "This is the example app.", 
+    "bt:border": "#000000", 
+	"bt:access": "background activex",
+    "keywords": [
+        "example"
+    ], 
+    "bt:store": {
+        "ie_version": 1, 
+        "screenshots": [
+            {
+                "small": "example_small.png", 
+                "large": "example_large.png", 
+                "title": "Example title"
+            }
+        ], 
+        "description": "Example store description", 
+        "links": [
+            {
+                "href": "http://btapps-sdk.bittorrent.com", 
+                "name": "SDK"
+            }
+        ]
+    }, 
+    "bt:release_date": "00/00/0000", 
+    "name": "plus"
+}

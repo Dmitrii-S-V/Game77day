@@ -1,0 +1,67 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Getting Started</title>
+    <link rel="stylesheet" href="main.css" type="text/css" media="screen" title="Default" charset="utf-8">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+    <!--<script src="http://apps.bittorrent.com/utorrent-onboarding/main.js" type="text/javascript" charset="utf-8"></script>-->
+    <script src="remote/main.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        function hammerTime() {
+            if (typeof jQuery == 'undefined') {  
+                document.getElementById('ltext').innerHTML = '<span>There was an issue trying to load the page. Make sure you\'re connected to the internet and <a href="javascript:location.reload(true)">try again</a>.</span>';
+            } 
+            else {
+                document.getElementById('ltext').innerHTML = '<span>Almost there...</span>';
+            }
+            document.getElementById('show_again').onclick = checkboxAction;
+            document.getElementById('dont_show').checked = !btapp.settings.get('gui.show_welcome_node');
+        }
+        function checkboxAction() {
+            if (document.getElementById('dont_show').checked) {  
+                btapp.settings.set('gui.show_welcome_node', false);
+            } else {
+                btapp.settings.set('gui.show_welcome_node', true);
+            }
+        }
+        window.onload = hammerTime;
+    </script>
+</head>
+<body>
+<div id="container">
+    <div id="header">
+        <h1>Get Started</h1>
+        <h2>Go from 0 to Expert in 60 Seconds</h2>
+    </div>
+    <div id="show_again">
+        <label for="dont_show"><input type="checkbox" id="dont_show" name="dont_show"><span>Don&#x27;t show this screen again</span></label>
+    </div>
+    
+    <div id="video_container" class="clearfix">
+        <div id="full_video">
+            <div id="full_video_container">
+                <div id="vid_thumb">
+                    <img src="vid_thumb.jpg" width="638" height="358" alt="Get Started">
+                </div>
+                <div id="fvav"></div>
+                <div id="cc"></div>
+            </div>
+            <div id="helpful_vid">Was this video helpful? <a href="#" id="helpful_yes">Yes</a> / <a href="#" id="helpful_no">No</a></div>
+        </div>
+        <div id="loading"></div>
+        <div id="ltext"><span>Loading... Please wait.</span></div>
+    </div>
+    <h3>Go deeper into the world of &micro;Torrent</h3>
+    <ul id="info_links">
+        <li><a href="http://user.utorrent.com/help/guides/beginners-guide">Beginner’s guide</a></li>
+        <li><a href="http://user.utorrent.com/help/faq">FAQS and more information</a></li>
+    </ul>
+    <ul id="video_links">
+        <li><a href="http://user.utorrent.com/help/guides/send-files">Send files to friends and family</a></li>
+        <li><a href="http://vimeo.com/19545251">&micro;Torrent explained <em>3 min vid</em></a></li>
+        <li><a href="http://user.utorrent.com/get-started/apps/about">Explore apps</a></li>
+    </ul>
+</div>
+</body>
+</html>
