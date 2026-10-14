@@ -1,0 +1,262 @@
+{
+  "blood": {
+    "ambient_color": [
+      1.0,
+      0.797,
+      0.766
+    ],
+    "ambient_energy": 0.24,
+    "brightness": 0.946,
+    "contrast": 1.1038,
+    "exposure": 0.963,
+    "fog_aerial": 0.55,
+    "fog_begin": 0.0,
+    "fog_color": [
+      0.24,
+      0.05,
+      0.035
+    ],
+    "fog_curve": 0.1,
+    "fog_density": 1.0,
+    "fog_end": 228.5,
+    "fog_height": 8.0,
+    "fog_height_density": 0.004,
+    "fog_sky_affect": 0.2475,
+    "glow": 0.445,
+    "grain": 0.03,
+    "moon_color": [
+      1.0,
+      0.719,
+      0.719
+    ],
+    "moon_energy": 0.585,
+    "moon_glow": 2.0,
+    "moon_size": 1.359,
+    "saturation": 1.025,
+    "shadow_blur": 1.4,
+    "shadow_opacity": 1.0,
+    "sky_curve": 0.385,
+    "sky_ground_dark": 0.45,
+    "sky_horizon": [
+      0.414,
+      0.162,
+      0.162
+    ],
+    "sky_top": [
+      0.273,
+      0.214,
+      0.214
+    ],
+    "ssao": 3.22,
+    "stars": 0.35,
+    "sun_color": [
+      1.0,
+      0.96,
+      0.9
+    ],
+    "sun_energy": 0.0,
+    "sun_glow": 1.0,
+    "sun_size": 1.0075,
+    "tint": [
+      1.03,
+      0.93,
+      0.9
+    ],
+    "vignette": 0.3
+  },
+  "day": {
+    "ambient_color": [
+      0.996,
+      0.947,
+      0.852
+    ],
+    "ambient_energy": 0.39,
+    "brightness": 0.8313,
+    "contrast": 0.965,
+    "exposure": 0.991,
+    "fog_aerial": 0.55,
+    "fog_begin": 0.0,
+    "fog_color": [
+      0.515,
+      0.547,
+      0.676
+    ],
+    "fog_curve": 0.9555,
+    "fog_density": 0.5925,
+    "fog_end": 1062.2,
+    "fog_height": 8.0,
+    "fog_height_density": 0.003,
+    "fog_sky_affect": 0.22,
+    "glow": 0.25,
+    "grain": 0.0195,
+    "moon_color": [
+      0.82,
+      0.86,
+      0.95
+    ],
+    "moon_energy": 0.0,
+    "moon_glow": 0.97,
+    "moon_size": 0.998,
+    "saturation": 0.965,
+    "shadow_blur": 0.6625,
+    "shadow_opacity": 0.995,
+    "sky_curve": 0.1285,
+    "sky_ground_dark": 0.9575,
+    "sky_horizon": [
+      0.953,
+      0.977,
+      1.0
+    ],
+    "sky_top": [
+      0.563,
+      0.702,
+      1.0
+    ],
+    "ssao": 3.22,
+    "stars": 0.0,
+    "sun_color": [
+      0.934,
+      0.846,
+      0.733
+    ],
+    "sun_energy": 2.8725,
+    "sun_glow": 3.99,
+    "sun_size": 3.9905,
+    "tint": [
+      0.898,
+      0.967,
+      1.0
+    ],
+    "vignette": 0.3
+  },
+  "dusk": {
+    "ambient_color": [
+      0.77,
+      0.605,
+      0.46
+    ],
+    "ambient_energy": 0.35,
+    "brightness": 1.0,
+    "contrast": 1.06,
+    "exposure": 1.05,
+    "fog_aerial": 0.55,
+    "fog_begin": 8.0,
+    "fog_color": [
+      0.55,
+      0.46,
+      0.42
+    ],
+    "fog_curve": 0.7,
+    "fog_density": 0.95,
+    "fog_end": 420.0,
+    "fog_height": 8.0,
+    "fog_height_density": 0.004,
+    "fog_sky_affect": 0.25,
+    "glow": 0.35,
+    "grain": 0.03,
+    "moon_color": [
+      0.82,
+      0.86,
+      0.95
+    ],
+    "moon_energy": 0.15,
+    "moon_glow": 1.0,
+    "moon_size": 1.0,
+    "saturation": 0.95,
+    "shadow_blur": 1.4,
+    "shadow_opacity": 1.0,
+    "sky_curve": 0.5893,
+    "sky_ground_dark": 0.45,
+    "sky_horizon": [
+      0.62,
+      0.46,
+      0.38
+    ],
+    "sky_top": [
+      0.547,
+      0.431,
+      0.594
+    ],
+    "ssao": 3.2,
+    "stars": 0.3,
+    "sun_color": [
+      1.0,
+      0.58,
+      0.32
+    ],
+    "sun_energy": 2.1375,
+    "sun_glow": 1.0,
+    "sun_size": 1.0,
+    "tint": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vignette": 0.3
+  },
+  "night": {
+    "ambient_color": [
+      0.5,
+      0.56,
+      0.68
+    ],
+    "ambient_energy": 0.36,
+    "brightness": 1.1925,
+    "contrast": 1.055,
+    "exposure": 1.068,
+    "fog_aerial": 0.55,
+    "fog_begin": 3.0,
+    "fog_color": [
+      0.105,
+      0.125,
+      0.17
+    ],
+    "fog_curve": 0.7235,
+    "fog_density": 0.6625,
+    "fog_end": 149.1,
+    "fog_height": 8.5,
+    "fog_height_density": 0.004,
+    "fog_sky_affect": 0.305,
+    "glow": 0.35,
+    "grain": 0.025,
+    "moon_color": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "moon_energy": 0.0525,
+    "moon_glow": 1.0,
+    "moon_size": 1.0,
+    "saturation": 0.85,
+    "shadow_blur": 1.15,
+    "shadow_opacity": 1.0,
+    "sky_curve": 0.119,
+    "sky_ground_dark": 0.795,
+    "sky_horizon": [
+      0.393,
+      0.431,
+      0.516
+    ],
+    "sky_top": [
+      0.092,
+      0.091,
+      0.109
+    ],
+    "ssao": 3.2,
+    "stars": 1.0,
+    "sun_color": [
+      1.0,
+      0.96,
+      0.9
+    ],
+    "sun_energy": 0.0,
+    "sun_glow": 0.99,
+    "sun_size": 1.0,
+    "tint": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vignette": 0.41
+  }
+}

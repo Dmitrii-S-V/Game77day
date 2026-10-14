@@ -1,0 +1,239 @@
+{
+  "_comment": "Атлас флоры (assets/textures/flora.png, 8x4 ячейки): plant — вертикальные карточки, rock — камни-карточки, ground — плоские пятна на земле. size: высота (plant, rock) или ширина (ground) в метрах. Плотность — константы в scripts/world/grass_field.gd.",
+  "cols": 8,
+  "items": [
+    {
+      "aspect": 1.54,
+      "cell": 0,
+      "key": "nature_0",
+      "kind": "plant",
+      "size": 0.72,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.77,
+      "cell": 1,
+      "key": "nature_2",
+      "kind": "plant",
+      "size": 0.85,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.04,
+      "cell": 2,
+      "key": "nature_3",
+      "kind": "plant",
+      "size": 0.83,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.69,
+      "cell": 3,
+      "key": "nature_4",
+      "kind": "plant",
+      "size": 0.85,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.65,
+      "cell": 4,
+      "key": "nature_5",
+      "kind": "plant",
+      "size": 0.85,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.77,
+      "cell": 5,
+      "key": "nature_6",
+      "kind": "plant",
+      "size": 0.86,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.57,
+      "cell": 6,
+      "key": "nature_7",
+      "kind": "plant",
+      "size": 0.86,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.85,
+      "cell": 7,
+      "key": "nature_8",
+      "kind": "plant",
+      "size": 0.84,
+      "weight": 1.0
+    },
+    {
+      "aspect": 3.09,
+      "cell": 8,
+      "key": "nature_9",
+      "kind": "plant",
+      "size": 0.58,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.53,
+      "cell": 9,
+      "key": "nature_10",
+      "kind": "rock",
+      "size": 0.48,
+      "weight": 0.7
+    },
+    {
+      "aspect": 0.91,
+      "cell": 10,
+      "key": "nature_11",
+      "kind": "plant",
+      "size": 0.85,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.61,
+      "cell": 11,
+      "key": "nature_12",
+      "kind": "plant",
+      "size": 0.7,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.51,
+      "cell": 12,
+      "key": "nature_13",
+      "kind": "rock",
+      "size": 0.51,
+      "weight": 0.7
+    },
+    {
+      "aspect": 0.97,
+      "cell": 13,
+      "key": "nature_14",
+      "kind": "rock",
+      "size": 0.64,
+      "weight": 0.7
+    },
+    {
+      "aspect": 1.1,
+      "cell": 14,
+      "key": "nature_15",
+      "kind": "rock",
+      "size": 0.58,
+      "weight": 0.7
+    },
+    {
+      "aspect": 1.13,
+      "cell": 15,
+      "key": "nature_16",
+      "kind": "rock",
+      "size": 0.56,
+      "weight": 0.7
+    },
+    {
+      "aspect": 1.01,
+      "cell": 16,
+      "key": "nature_17",
+      "kind": "rock",
+      "size": 0.62,
+      "weight": 0.7
+    },
+    {
+      "aspect": 1.18,
+      "cell": 17,
+      "key": "nature_18",
+      "kind": "rock",
+      "size": 0.52,
+      "weight": 0.7
+    },
+    {
+      "aspect": 1.69,
+      "cell": 18,
+      "key": "nature_19",
+      "kind": "ground",
+      "size": 2.27,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.67,
+      "cell": 19,
+      "key": "nature_20",
+      "kind": "ground",
+      "size": 2.3,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.35,
+      "cell": 20,
+      "key": "nature_21",
+      "kind": "ground",
+      "size": 2.29,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "cell": 21,
+      "key": "nature_22",
+      "kind": "rock",
+      "size": 0.64,
+      "weight": 0.7
+    },
+    {
+      "aspect": 4.13,
+      "cell": 22,
+      "key": "nature_24",
+      "kind": "ground",
+      "size": 2.34,
+      "weight": 1.0
+    },
+    {
+      "aspect": 3.64,
+      "cell": 23,
+      "key": "nature_26",
+      "kind": "ground",
+      "size": 2.34,
+      "weight": 1.0
+    },
+    {
+      "aspect": 2.09,
+      "cell": 24,
+      "key": "nature_27",
+      "kind": "ground",
+      "size": 2.31,
+      "weight": 1.0
+    },
+    {
+      "aspect": 2.18,
+      "cell": 25,
+      "key": "nature_28",
+      "kind": "ground",
+      "size": 2.31,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.35,
+      "cell": 26,
+      "key": "nature_30",
+      "kind": "ground",
+      "size": 2.28,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.66,
+      "cell": 27,
+      "key": "nature_31",
+      "kind": "plant",
+      "size": 0.69,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.29,
+      "cell": 28,
+      "key": "nature_32",
+      "kind": "ground",
+      "size": 2.3,
+      "weight": 1.0
+    }
+  ],
+  "rows": 4
+}

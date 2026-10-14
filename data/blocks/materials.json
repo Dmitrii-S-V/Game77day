@@ -1,0 +1,43 @@
+{
+  "texture_size": 1024,
+  "_texture_note": "texture_size — размер слоя массива текстур (256 / 512 / 1024). Файлы assets/textures/blocks/<имя>.png (цвет), <имя>_n.png (нормаль, OpenGL), <имя>_r.png (шероховатость) подхватываются автоматически; импорт из ambientCG/Poly Haven: tools/import_pbr.gd. У материала можно задать tile — сколько метров занимает один повтор текстуры (по умолчанию 1).",
+  "_comment": "Материалы блоков построек. kind: wood | stone | glass | cloth | metal | wax. hp — прочность, tex — варианты текстуры (имена файлов в assets/textures/blocks/<имя>.png; если файла нет, рисуется процедурная заглушка). Меняйте числа здесь, код трогать не нужно.",
+  "tool_multipliers": {
+    "_comment": "Множитель урона инструмента по типу материала (урон = базовый урон удара * множитель).",
+    "axe":     { "wood": 1.0, "stone": 0.3, "glass": 6.0, "cloth": 3.0, "metal": 0.35, "wax": 3.0 },
+    "pickaxe": { "wood": 0.5, "stone": 1.2, "glass": 6.0, "cloth": 2.0, "metal": 0.8,  "wax": 2.0 },
+    "hand":    { "wood": 0.15, "stone": 0.05, "glass": 3.0, "cloth": 2.0, "metal": 0.05, "wax": 2.0 },
+    "zombie":  { "wood": 1.0,  "stone": 0.25, "glass": 4.0, "cloth": 3.0, "metal": 0.2,  "wax": 3.0 }
+  },
+  "materials": {
+    "frame":              { "name": "Каркас",                     "kind": "wood", "tile": 1.5,  "hp": 20,   "tex": ["frame"] },
+    "planks_fresh":       { "name": "Доски свежие",               "kind": "wood", "tile": 1.5,  "hp": 150,  "tex": ["planks_fresh_0", "planks_fresh_1", "planks_fresh_2"] },
+    "planks_worn":        { "name": "Доски потрёпанные",          "kind": "wood", "tile": 1.5,  "hp": 100,  "tex": ["planks_worn_0", "planks_worn_1", "planks_worn_2"] },
+    "planks_rotten":      { "name": "Доски гнилые",              "kind": "wood", "tile": 1.5,  "hp": 60,   "tex": ["planks_rotten_0", "planks_rotten_1", "planks_rotten_2"] },
+    "planks_dying":       { "name": "Доски почти сгнившие",      "kind": "wood", "tile": 1.5,  "hp": 30,   "tex": ["planks_dying_0", "planks_dying_1", "planks_dying_2"] },
+    "concrete_smooth":    { "name": "Бетон гладкий",              "kind": "stone", "tile": 2.0, "hp": 800,  "tex": ["concrete_smooth_0", "concrete_smooth_1"] },
+    "concrete_cracked":   { "name": "Бетон потрескавшийся",       "kind": "stone", "tile": 2.0, "hp": 500,  "tex": ["concrete_cracked_0", "concrete_cracked_1"] },
+    "concrete_reinforced":{ "name": "Бетон армированный",         "kind": "stone", "tile": 2.0, "hp": 1200, "tex": ["concrete_reinforced_0", "concrete_reinforced_1"] },
+    "concrete_dirty":     { "name": "Бетон старый грязный",       "kind": "stone", "tile": 2.0, "hp": 600,  "tex": ["concrete_dirty_0", "concrete_dirty_1"] },
+    "door_wood":          { "name": "Дверь деревянная",           "kind": "wood",  "hp": 200,  "tex": ["door_wood_0", "door_wood_1"] },
+    "door_boarded":       { "name": "Дверь заколоченная досками", "kind": "wood",  "hp": 300,  "tex": ["door_boarded_0", "door_boarded_1"] },
+    "window_ok":          { "name": "Окно целое",                 "kind": "glass", "hp": 40,   "tex": ["window_frame_0", "window_frame_1"] },
+    "window_broken":      { "name": "Окно разбитое",              "kind": "glass", "hp": 15,   "tex": ["window_frame_0", "window_frame_1"] },
+    "window_boarded":     { "name": "Окно заколоченное досками",  "kind": "wood",  "hp": 120,  "tex": ["window_boarded_0", "window_boarded_1"] },
+    "web":                { "name": "Паутина",                    "kind": "cloth", "hp": 5,    "tex": ["web_0", "web_1"] },
+    "chandelier":         { "name": "Люстра",                     "kind": "metal", "hp": 25,   "tex": ["brass"] },
+    "candle":             { "name": "Свеча настольная",           "kind": "wax",   "hp": 5,    "tex": ["wax"] },
+    "carpet":             { "name": "Ковёр",                      "kind": "cloth", "hp": 30,   "tex": ["carpet_0", "carpet_1", "carpet_2"] },
+    "metal_rusty":        { "name": "Металл ржавый",              "kind": "metal", "tile": 1.0, "hp": 500,  "tex": ["metal_rusty_0", "metal_rusty_1"] },
+    "metal_corrugated":   { "name": "Профлист",                   "kind": "metal", "tile": 1.0, "hp": 250,  "tex": ["metal_corrugated_0", "metal_corrugated_1"] },
+    "concrete_tiles_painted": { "name": "Бетонные плиты крашеные", "kind": "stone", "tile": 2.0, "hp": 650, "tex": ["concrete_tiles_painted_0"] },
+    "brick_painted":      { "name": "Кирпич крашеный",            "kind": "stone", "tile": 1.3, "hp": 550,  "tex": ["brick_painted_0"] },
+    "concrete_block_red": { "name": "Бетонные блоки красные",     "kind": "stone", "tile": 0.8, "hp": 600,  "tex": ["concrete_block_red_0"] },
+    "metal_sheet_rusty":  { "name": "Профлист ржавый крашеный",   "kind": "metal", "tile": 1.6, "hp": 300,  "tex": ["metal_sheet_rusty_0"] },
+    "railing_wood":       { "name": "Перила деревянные",          "kind": "wood",  "tile": 1.0, "hp": 200,  "tex": ["planks_worn_0", "planks_worn_1"] },
+    "chainlink_fence":    { "name": "Сетка-рабица",               "kind": "metal", "tile": 1.0, "hp": 300,  "tex": ["chainlink"] },
+    "sofa_old":           { "name": "Диван старый",               "kind": "cloth", "hp": 150,  "tex": ["carpet_0"] },
+    "fence_concrete":     { "name": "Забор бетонный с сеткой",    "kind": "stone", "hp": 700,  "tex": ["concrete_dirty_0"] }
+  },
+  "extra_textures": ["flame", "boards", "glass_shard"]
+}

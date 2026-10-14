@@ -1,0 +1,1618 @@
+{
+  "_comment": "Таблица декалей. Спрайты: assets/textures/decals/<key>.png (квадрат, альфа). kind — класс (см. tools/build_decal_table.gd), size — сторона квадрата спрайта в метрах на стене/земле, weight — вес при случайном износе, places — где применять: wall (грани блоков), ground (ландшафт), card (вертикальные карточки растений). Правьте вручную — скрипт сборки не перезапишет уже существующие записи.",
+  "decals": [
+    {
+      "aspect": 0.92,
+      "file": "res://assets/textures/decals/mud_0.png",
+      "id": 1,
+      "key": "mud_0",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.7,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.9,
+      "file": "res://assets/textures/decals/mud_1.png",
+      "id": 2,
+      "key": "mud_1",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.23,
+      "file": "res://assets/textures/decals/mud_2.png",
+      "id": 3,
+      "key": "mud_2",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.95,
+      "file": "res://assets/textures/decals/mud_3.png",
+      "id": 4,
+      "key": "mud_3",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.7,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.48,
+      "file": "res://assets/textures/decals/mud_4.png",
+      "id": 5,
+      "key": "mud_4",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.46,
+      "file": "res://assets/textures/decals/mud_5.png",
+      "id": 6,
+      "key": "mud_5",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.82,
+      "file": "res://assets/textures/decals/mud_6.png",
+      "id": 7,
+      "key": "mud_6",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.96,
+      "file": "res://assets/textures/decals/mud_7.png",
+      "id": 8,
+      "key": "mud_7",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.91,
+      "file": "res://assets/textures/decals/mud_8.png",
+      "id": 9,
+      "key": "mud_8",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.66,
+      "file": "res://assets/textures/decals/mud_9.png",
+      "id": 10,
+      "key": "mud_9",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/mud_10.png",
+      "id": 11,
+      "key": "mud_10",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.69,
+      "file": "res://assets/textures/decals/mud_11.png",
+      "id": 12,
+      "key": "mud_11",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.82,
+      "file": "res://assets/textures/decals/mud_12.png",
+      "id": 13,
+      "key": "mud_12",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.5,
+      "file": "res://assets/textures/decals/mud_13.png",
+      "id": 14,
+      "key": "mud_13",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 1.29,
+      "file": "res://assets/textures/decals/mud_14.png",
+      "id": 15,
+      "key": "mud_14",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.6,
+      "file": "res://assets/textures/decals/mud_15.png",
+      "id": 16,
+      "key": "mud_15",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.62,
+      "file": "res://assets/textures/decals/mud_16.png",
+      "id": 17,
+      "key": "mud_16",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.74,
+      "file": "res://assets/textures/decals/mud_17.png",
+      "id": 18,
+      "key": "mud_17",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.97,
+      "file": "res://assets/textures/decals/mud_18.png",
+      "id": 19,
+      "key": "mud_18",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 1.05,
+      "file": "res://assets/textures/decals/mud_19.png",
+      "id": 20,
+      "key": "mud_19",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.71,
+      "file": "res://assets/textures/decals/mud_20.png",
+      "id": 21,
+      "key": "mud_20",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.74,
+      "file": "res://assets/textures/decals/mud_21.png",
+      "id": 22,
+      "key": "mud_21",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/mud_22.png",
+      "id": 23,
+      "key": "mud_22",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 1.08,
+      "file": "res://assets/textures/decals/mud_23.png",
+      "id": 24,
+      "key": "mud_23",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.81,
+      "file": "res://assets/textures/decals/mud_24.png",
+      "id": 25,
+      "key": "mud_24",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 0.96,
+      "file": "res://assets/textures/decals/mud_25.png",
+      "id": 26,
+      "key": "mud_25",
+      "kind": "print",
+      "places": [
+        "wall"
+      ],
+      "size": 0.35,
+      "weight": 0.6
+    },
+    {
+      "aspect": 1.76,
+      "file": "res://assets/textures/decals/mud_26.png",
+      "id": 27,
+      "key": "mud_26",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.59,
+      "file": "res://assets/textures/decals/mud_27.png",
+      "id": 28,
+      "key": "mud_27",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.05,
+      "file": "res://assets/textures/decals/mud_28.png",
+      "id": 29,
+      "key": "mud_28",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.86,
+      "file": "res://assets/textures/decals/mud_29.png",
+      "id": 30,
+      "key": "mud_29",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.64,
+      "file": "res://assets/textures/decals/mud_30.png",
+      "id": 31,
+      "key": "mud_30",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.23,
+      "file": "res://assets/textures/decals/mud_31.png",
+      "id": 32,
+      "key": "mud_31",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.71,
+      "file": "res://assets/textures/decals/mud_32.png",
+      "id": 33,
+      "key": "mud_32",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.32,
+      "file": "res://assets/textures/decals/mud_33.png",
+      "id": 34,
+      "key": "mud_33",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.95,
+      "file": "res://assets/textures/decals/mud_34.png",
+      "id": 35,
+      "key": "mud_34",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/mud_35.png",
+      "id": 36,
+      "key": "mud_35",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.24,
+      "file": "res://assets/textures/decals/mud_36.png",
+      "id": 37,
+      "key": "mud_36",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.69,
+      "file": "res://assets/textures/decals/mud_37.png",
+      "id": 38,
+      "key": "mud_37",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.67,
+      "file": "res://assets/textures/decals/mud_38.png",
+      "id": 39,
+      "key": "mud_38",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.44,
+      "file": "res://assets/textures/decals/mud_39.png",
+      "id": 40,
+      "key": "mud_39",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.54,
+      "file": "res://assets/textures/decals/mud_40.png",
+      "id": 41,
+      "key": "mud_40",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.11,
+      "file": "res://assets/textures/decals/mud_41.png",
+      "id": 42,
+      "key": "mud_41",
+      "kind": "grime",
+      "places": [
+        "wall",
+        "ground"
+      ],
+      "size": 0.45,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/signs_0.png",
+      "id": 43,
+      "key": "signs_0",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.5
+    },
+    {
+      "aspect": 1.56,
+      "file": "res://assets/textures/decals/signs_1.png",
+      "id": 44,
+      "key": "signs_1",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.5
+    },
+    {
+      "aspect": 0.99,
+      "file": "res://assets/textures/decals/signs_2.png",
+      "id": 45,
+      "key": "signs_2",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.7,
+      "weight": 0.5
+    },
+    {
+      "aspect": 1.14,
+      "file": "res://assets/textures/decals/signs_3.png",
+      "id": 46,
+      "key": "signs_3",
+      "kind": "stencil",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.85,
+      "file": "res://assets/textures/decals/signs_4.png",
+      "id": 47,
+      "key": "signs_4",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.7,
+      "weight": 0.5
+    },
+    {
+      "aspect": 1.48,
+      "file": "res://assets/textures/decals/signs_5.png",
+      "id": 48,
+      "key": "signs_5",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.5
+    },
+    {
+      "aspect": 2.67,
+      "file": "res://assets/textures/decals/signs_6.png",
+      "id": 49,
+      "key": "signs_6",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.5
+    },
+    {
+      "aspect": 2.69,
+      "file": "res://assets/textures/decals/signs_7.png",
+      "id": 50,
+      "key": "signs_7",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.5
+    },
+    {
+      "aspect": 0.91,
+      "file": "res://assets/textures/decals/signs_8.png",
+      "id": 51,
+      "key": "signs_8",
+      "kind": "rust",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/signs_9.png",
+      "id": 52,
+      "key": "signs_9",
+      "kind": "skip",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/signs_10.png",
+      "id": 53,
+      "key": "signs_10",
+      "kind": "hole",
+      "places": [
+        "wall"
+      ],
+      "size": 0.2,
+      "weight": 1.2
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/signs_11.png",
+      "id": 54,
+      "key": "signs_11",
+      "kind": "hole",
+      "places": [
+        "wall"
+      ],
+      "size": 0.2,
+      "weight": 1.2
+    },
+    {
+      "aspect": 1.9,
+      "file": "res://assets/textures/decals/signs_12.png",
+      "id": 55,
+      "key": "signs_12",
+      "kind": "stencil",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.98,
+      "file": "res://assets/textures/decals/signs_13.png",
+      "id": 56,
+      "key": "signs_13",
+      "kind": "rust",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.76,
+      "file": "res://assets/textures/decals/signs_14.png",
+      "id": 57,
+      "key": "signs_14",
+      "kind": "hole",
+      "places": [
+        "wall"
+      ],
+      "size": 0.28,
+      "weight": 1.2
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/signs_15.png",
+      "id": 58,
+      "key": "signs_15",
+      "kind": "hole",
+      "places": [
+        "wall"
+      ],
+      "size": 0.2,
+      "weight": 1.2
+    },
+    {
+      "aspect": 0.88,
+      "file": "res://assets/textures/decals/signs_16.png",
+      "id": 59,
+      "key": "signs_16",
+      "kind": "hole",
+      "places": [
+        "wall"
+      ],
+      "size": 0.2,
+      "weight": 1.2
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/signs_17.png",
+      "id": 60,
+      "key": "signs_17",
+      "kind": "hole",
+      "places": [
+        "wall"
+      ],
+      "size": 0.2,
+      "weight": 1.2
+    },
+    {
+      "aspect": 0.58,
+      "file": "res://assets/textures/decals/signs_18.png",
+      "id": 61,
+      "key": "signs_18",
+      "kind": "scratch",
+      "places": [
+        "wall"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.4,
+      "file": "res://assets/textures/decals/signs_19.png",
+      "id": 62,
+      "key": "signs_19",
+      "kind": "scratch",
+      "places": [
+        "wall"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.2,
+      "file": "res://assets/textures/decals/signs_20.png",
+      "id": 63,
+      "key": "signs_20",
+      "kind": "rust",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.05,
+      "file": "res://assets/textures/decals/signs_21.png",
+      "id": 64,
+      "key": "signs_21",
+      "kind": "stencil",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.4,
+      "file": "res://assets/textures/decals/signs_22.png",
+      "id": 65,
+      "key": "signs_22",
+      "kind": "stencil",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.67,
+      "file": "res://assets/textures/decals/signs_23.png",
+      "id": 66,
+      "key": "signs_23",
+      "kind": "stencil",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.12,
+      "file": "res://assets/textures/decals/signs_24.png",
+      "id": 67,
+      "key": "signs_24",
+      "kind": "rust",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 2.13,
+      "file": "res://assets/textures/decals/signs_25.png",
+      "id": 68,
+      "key": "signs_25",
+      "kind": "scratch",
+      "places": [
+        "wall"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.07,
+      "file": "res://assets/textures/decals/signs_26.png",
+      "id": 69,
+      "key": "signs_26",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.7,
+      "weight": 0.5
+    },
+    {
+      "aspect": 1.74,
+      "file": "res://assets/textures/decals/signs_27.png",
+      "id": 70,
+      "key": "signs_27",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.7,
+      "weight": 0.5
+    },
+    {
+      "aspect": 1.83,
+      "file": "res://assets/textures/decals/signs_28.png",
+      "id": 71,
+      "key": "signs_28",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.5
+    },
+    {
+      "aspect": 1.61,
+      "file": "res://assets/textures/decals/signs_29.png",
+      "id": 72,
+      "key": "signs_29",
+      "kind": "rust",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.02,
+      "file": "res://assets/textures/decals/supply_0.png",
+      "id": 73,
+      "key": "supply_0",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.04,
+      "file": "res://assets/textures/decals/supply_1.png",
+      "id": 74,
+      "key": "supply_1",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.95,
+      "file": "res://assets/textures/decals/supply_2.png",
+      "id": 75,
+      "key": "supply_2",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.8,
+      "file": "res://assets/textures/decals/supply_3.png",
+      "id": 76,
+      "key": "supply_3",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.64,
+      "file": "res://assets/textures/decals/supply_4.png",
+      "id": 77,
+      "key": "supply_4",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.02,
+      "file": "res://assets/textures/decals/supply_5.png",
+      "id": 78,
+      "key": "supply_5",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/supply_6.png",
+      "id": 79,
+      "key": "supply_6",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.04,
+      "file": "res://assets/textures/decals/supply_7.png",
+      "id": 80,
+      "key": "supply_7",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.65,
+      "weight": 0.4
+    },
+    {
+      "aspect": 2.27,
+      "file": "res://assets/textures/decals/supply_8.png",
+      "id": 81,
+      "key": "supply_8",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.95,
+      "file": "res://assets/textures/decals/supply_9.png",
+      "id": 82,
+      "key": "supply_9",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.97,
+      "file": "res://assets/textures/decals/supply_10.png",
+      "id": 83,
+      "key": "supply_10",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/supply_11.png",
+      "id": 84,
+      "key": "supply_11",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.19,
+      "file": "res://assets/textures/decals/supply_12.png",
+      "id": 85,
+      "key": "supply_12",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.04,
+      "file": "res://assets/textures/decals/supply_13.png",
+      "id": 86,
+      "key": "supply_13",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.01,
+      "file": "res://assets/textures/decals/supply_14.png",
+      "id": 87,
+      "key": "supply_14",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.65,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.89,
+      "file": "res://assets/textures/decals/supply_15.png",
+      "id": 88,
+      "key": "supply_15",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.65,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.03,
+      "file": "res://assets/textures/decals/supply_16.png",
+      "id": 89,
+      "key": "supply_16",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.02,
+      "file": "res://assets/textures/decals/supply_17.png",
+      "id": 90,
+      "key": "supply_17",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.05,
+      "file": "res://assets/textures/decals/supply_18.png",
+      "id": 91,
+      "key": "supply_18",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 2.41,
+      "file": "res://assets/textures/decals/supply_19.png",
+      "id": 92,
+      "key": "supply_19",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.65,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.08,
+      "file": "res://assets/textures/decals/supply_20.png",
+      "id": 93,
+      "key": "supply_20",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.5,
+      "weight": 0.4
+    },
+    {
+      "aspect": 2.19,
+      "file": "res://assets/textures/decals/supply_21.png",
+      "id": 94,
+      "key": "supply_21",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.85,
+      "weight": 0.4
+    },
+    {
+      "aspect": 1.4,
+      "file": "res://assets/textures/decals/supply_22.png",
+      "id": 95,
+      "key": "supply_22",
+      "kind": "sign",
+      "places": [
+        "wall"
+      ],
+      "size": 0.65,
+      "weight": 0.4
+    },
+    {
+      "aspect": 0.92,
+      "file": "res://assets/textures/decals/posters_0.png",
+      "id": 96,
+      "key": "posters_0",
+      "kind": "poster",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.35
+    },
+    {
+      "aspect": 1.45,
+      "file": "res://assets/textures/decals/posters_1.png",
+      "id": 97,
+      "key": "posters_1",
+      "kind": "poster",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.35
+    },
+    {
+      "aspect": 1.45,
+      "file": "res://assets/textures/decals/posters_2.png",
+      "id": 98,
+      "key": "posters_2",
+      "kind": "poster",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.35
+    },
+    {
+      "aspect": 1.54,
+      "file": "res://assets/textures/decals/posters_3.png",
+      "id": 99,
+      "key": "posters_3",
+      "kind": "poster",
+      "places": [
+        "wall"
+      ],
+      "size": 0.9,
+      "weight": 0.35
+    },
+    {
+      "aspect": 1.5,
+      "file": "res://assets/textures/decals/nature_0.png",
+      "id": 100,
+      "key": "nature_0",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.8,
+      "file": "res://assets/textures/decals/nature_1.png",
+      "id": 101,
+      "key": "nature_1",
+      "kind": "skip",
+      "places": [],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.79,
+      "file": "res://assets/textures/decals/nature_2.png",
+      "id": 102,
+      "key": "nature_2",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.04,
+      "file": "res://assets/textures/decals/nature_3.png",
+      "id": 103,
+      "key": "nature_3",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.71,
+      "file": "res://assets/textures/decals/nature_4.png",
+      "id": 104,
+      "key": "nature_4",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.67,
+      "file": "res://assets/textures/decals/nature_5.png",
+      "id": 105,
+      "key": "nature_5",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.79,
+      "file": "res://assets/textures/decals/nature_6.png",
+      "id": 106,
+      "key": "nature_6",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.6,
+      "file": "res://assets/textures/decals/nature_7.png",
+      "id": 107,
+      "key": "nature_7",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.86,
+      "file": "res://assets/textures/decals/nature_8.png",
+      "id": 108,
+      "key": "nature_8",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 2.94,
+      "file": "res://assets/textures/decals/nature_9.png",
+      "id": 109,
+      "key": "nature_9",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.37,
+      "file": "res://assets/textures/decals/nature_10.png",
+      "id": 110,
+      "key": "nature_10",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.9,
+      "file": "res://assets/textures/decals/nature_11.png",
+      "id": 111,
+      "key": "nature_11",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.57,
+      "file": "res://assets/textures/decals/nature_12.png",
+      "id": 112,
+      "key": "nature_12",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.46,
+      "file": "res://assets/textures/decals/nature_13.png",
+      "id": 113,
+      "key": "nature_13",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 0.98,
+      "file": "res://assets/textures/decals/nature_14.png",
+      "id": 114,
+      "key": "nature_14",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.12,
+      "file": "res://assets/textures/decals/nature_15.png",
+      "id": 115,
+      "key": "nature_15",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.09,
+      "file": "res://assets/textures/decals/nature_16.png",
+      "id": 116,
+      "key": "nature_16",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/nature_17.png",
+      "id": 117,
+      "key": "nature_17",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.13,
+      "file": "res://assets/textures/decals/nature_18.png",
+      "id": 118,
+      "key": "nature_18",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.6,
+      "file": "res://assets/textures/decals/nature_19.png",
+      "id": 119,
+      "key": "nature_19",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.62,
+      "file": "res://assets/textures/decals/nature_20.png",
+      "id": 120,
+      "key": "nature_20",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.33,
+      "file": "res://assets/textures/decals/nature_21.png",
+      "id": 121,
+      "key": "nature_21",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/nature_22.png",
+      "id": 122,
+      "key": "nature_22",
+      "kind": "rock",
+      "places": [
+        "ground"
+      ],
+      "size": 0.6,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/nature_23.png",
+      "id": 123,
+      "key": "nature_23",
+      "kind": "skip",
+      "places": [],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 3.87,
+      "file": "res://assets/textures/decals/nature_24.png",
+      "id": 124,
+      "key": "nature_24",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/nature_25.png",
+      "id": 125,
+      "key": "nature_25",
+      "kind": "skip",
+      "places": [],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 3.44,
+      "file": "res://assets/textures/decals/nature_26.png",
+      "id": 126,
+      "key": "nature_26",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 2.02,
+      "file": "res://assets/textures/decals/nature_27.png",
+      "id": 127,
+      "key": "nature_27",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 2.07,
+      "file": "res://assets/textures/decals/nature_28.png",
+      "id": 128,
+      "key": "nature_28",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.0,
+      "file": "res://assets/textures/decals/nature_29.png",
+      "id": 129,
+      "key": "nature_29",
+      "kind": "skip",
+      "places": [],
+      "size": 0.9,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.34,
+      "file": "res://assets/textures/decals/nature_30.png",
+      "id": 130,
+      "key": "nature_30",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.61,
+      "file": "res://assets/textures/decals/nature_31.png",
+      "id": 131,
+      "key": "nature_31",
+      "kind": "plant",
+      "places": [
+        "card"
+      ],
+      "size": 1.0,
+      "weight": 1.0
+    },
+    {
+      "aspect": 1.26,
+      "file": "res://assets/textures/decals/nature_32.png",
+      "id": 132,
+      "key": "nature_32",
+      "kind": "ground",
+      "places": [
+        "ground"
+      ],
+      "size": 3.0,
+      "weight": 1.0
+    }
+  ],
+  "weather": {
+    "density": 0.0,
+    "_density_note": "доля граней с декалью при автоматическом износе (BlockWeather.apply); умножается на пятнистый шум, у земли грязи больше",
+    "kinds": {
+      "stone": {"grime": 3.0, "rust": 2.0, "hole": 1.2, "scratch": 1.0, "stencil": 0.3, "sign": 0.4, "poster": 0.25, "print": 0.5},
+      "wood":  {"grime": 3.0, "print": 0.8, "hole": 0.6, "scratch": 1.2, "poster": 0.5, "sign": 0.3, "rust": 0.2},
+      "metal": {"rust": 4.0, "grime": 1.5, "hole": 1.0, "scratch": 2.0, "sign": 0.6, "stencil": 0.6}
+    },
+    "ground_rows": 2,
+    "ground_boost": {"grime": 2.5, "print": 3.0},
+    "floor": {"kinds": ["grime", "print"], "prob": 0.25}
+  }
+}
